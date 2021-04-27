@@ -35,7 +35,7 @@ class Entity {
                 if (propDesc.get) {
                     Object.defineProperty(this, k, propDesc);
                 } else {
-                    this[k] === component[k]
+                    this[k] = component[k]
                 }
             }
         }

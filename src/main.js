@@ -1,7 +1,7 @@
 'use strict'
 
 import { Calc, Terminal } from 'malwoden';
-import { Game } from './game';
+import { GameManager } from './game';
 import img from './agm_16x16.png';
 import { GameMap } from './gamemap';
 const clamp = (val, low, high) => Math.max(low, Math.min(val, high));
@@ -44,14 +44,6 @@ const DrawManager = {
     }
 }
 
-const newGame = () => {
-    const game = new Game();
-    const testMap = new GameMap(100, 75, "test-map", "Test Map");
-    game.addMap(testMap);
-    game.currentMap = "test-map";
-    return game;
-}
-
 window.onload = () => {
     const mountNode = document.getElementById('canvas');
 
@@ -65,14 +57,15 @@ window.onload = () => {
     };
     
     const terminal = new Terminal.RetroTerminal(displayOptions);
-    const game = newGame();
+    GameManager.addMap(testMap);
+    GameManager.curMap = "test-map";
     const tempCenter = {x: 25, y: 25};
     
     terminal.clear();
     for (let x=0; x<terminal.width; x++) {
         for (let y=0; y<terminal.height; y++) {
             const mapPoint = DrawManager._screenToMap(game.curMap, {x, y}, tempCenter, terminal);
-            const t = game.curMap.getTile(mapPoint.x, mapPoint.y);
+            const t = GameManager.curMap.getTile(mapPoint.x, mapPoint.y);
             if (t.glyph != null) {
                 DrawManager.drawAtPosition({x, y}, t.glyph, terminal);
             }

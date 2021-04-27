@@ -70,5 +70,15 @@ export class GameMap {
     getRandomFloor(rng) {
         return rng.nextItem(this._floors);
     }
+
+    isWalkable(x, y) {
+        const t = this.getTile(x, y);
+        return t.walk;
+    }
+
+    isTransparent(x, y) {
+        const t = this.getTile(x, y);
+        return t.see;
+    }
 }
 

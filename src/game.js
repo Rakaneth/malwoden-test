@@ -1,6 +1,6 @@
 import { Rand } from 'malwoden';
 
-export class Game {
+class Game {
     constructor() {
         this._scheduler = {};
         this._entities = {};
@@ -22,7 +22,7 @@ export class Game {
         return this._entities["player"];
     }
 
-    set currentMap(newMap) {
+    set curMap(newMap) {
         this._curMapId = newMap;
     }
     
@@ -41,5 +41,11 @@ export class Game {
             delete entities[entity];
         }
     }
+
+    getEntityAt(x, y, mapID) {
+        const pred = (e) => e.x === x && e.y === y && e.mapID === mapID;
+        return Object.values(this._entities).find(pred);
+    }
 }
 
+export const GameManager = new Game();

@@ -81,4 +81,9 @@ class Entity {
             this._mapID = mapID; 
         }
     }
+
+    moveBy(dx, dy) {
+        this._x += dx;
+        this._y += dy;
+    }
 }

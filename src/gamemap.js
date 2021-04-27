@@ -84,6 +84,18 @@ export class GameMap {
 }
 
 export const MapFactory = {
+    _wallBounds(gameMap) {
+        for(let x=0; x<gameMap.width; x++) {
+            gameMap.setTile(x, 0, 2);
+            gameMap.setTile(x, gameMap.height-1, 2);
+        }
+
+        for (let y=0; y<gameMap.height; y++) {
+            gameMap.setTile(0, y, 2);
+            gameMap.setTile(gameMap.width-1, y, 2);
+        }
+    },
+
     drunkWalk(width, height, id, name, dark) {
         const gameMap = new GameMap(width, height, id, name, dark);
         const gen = new Generation.DrunkardsWalk({
@@ -108,6 +120,8 @@ export const MapFactory = {
                 }
             }
         }
+
+        this._wallBounds(gameMap);
 
         return gameMap;
     }

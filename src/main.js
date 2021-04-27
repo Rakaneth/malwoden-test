@@ -1,6 +1,6 @@
 'use strict'
 
-import { Calc, Glyph, Terminal } from 'malwoden';
+import { Calc, Glyph, Input, Terminal } from 'malwoden';
 import { GameManager } from './game';
 import img from './agm_16x16.png';
 import { GameMap, MapFactory } from './gamemap';
@@ -62,20 +62,42 @@ window.onload = () => {
     GameManager.curMap = "test-map";
     const tempCenter = {x: 25, y: 25};
     const tempGlyph = new Glyph('X', Terminal.Color.Yellow);
-    
-    terminal.clear();
-    for (let x=0; x<terminal.width; x++) {
-        for (let y=0; y<terminal.height; y++) {
-            const mapPoint = DrawManager._screenToMap(GameManager.curMap, {x, y}, tempCenter, terminal);
-            const t = GameManager.curMap.getTile(mapPoint.x, mapPoint.y);
-            if (t.glyph != null) {
-                DrawManager.drawAtPosition({x, y}, t.glyph, terminal);
-            }
-            if (mapPoint.x === tempCenter.x && mapPoint.y === tempCenter.y) {
-                DrawManager.drawAtPosition({x, y}, tempGlyph, terminal);
+    const tempMoveBy = (dx, dy) => {
+        tempCenter.x += dx;
+        tempCenter.y += dy;
+        terminal.clear();
+        renderMap();
+        terminal.render();
+    };
+
+    const renderMap = () => {
+        for (let x=0; x<terminal.width; x++) {
+            for (let y=0; y<terminal.height; y++) {
+                const mapPoint = DrawManager._screenToMap(GameManager.curMap, {x, y}, tempCenter, terminal);
+                const t = GameManager.curMap.getTile(mapPoint.x, mapPoint.y);
+                if (t.glyph != null) {
+                    DrawManager.drawAtPosition({x, y}, t.glyph, terminal);
+                }
+                if (mapPoint.x === tempCenter.x && mapPoint.y === tempCenter.y) {
+                    DrawManager.drawAtPosition({x, y}, tempGlyph, terminal);
+                }
             }
         }
     }
+
+    //Keyboard
+
+    const movement = new Input.KeyboardContext()
+        .onUp(Input.KeyCode.W, () => tempMoveBy(0, -1))
+        .onUp(Input.KeyCode.A, () => tempMoveBy(-1, 0))
+        .onUp(Input.KeyCode.S, () => tempMoveBy(0, 1))
+        .onUp(Input.KeyCode.D, () => tempMoveBy(1, 0));
+
+    const keyboard = new Input.KeyboardHandler();
+    keyboard.setContext(movement);
+
+    terminal.clear();
+    renderMap();
     terminal.render();
 }
 

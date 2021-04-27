@@ -32,7 +32,7 @@ class Entity {
             const excludeProps = ['init', 'group', 'name', 'stats'];
             if (!(excludeProps.includes(k) || this.hasOwnProperty(k))) {
                 const propDesc = Object.getOwnPropertyDescriptor(component, k);
-                if (propDesc.get) {
+                if (propDesc.get || propDesc.set) {
                     Object.defineProperty(this, k, propDesc);
                 } else {
                     this[k] = component[k]

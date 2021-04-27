@@ -1,9 +1,9 @@
 'use strict'
 
-import { Calc, Terminal } from 'malwoden';
+import { Calc, Glyph, Terminal } from 'malwoden';
 import { GameManager } from './game';
 import img from './agm_16x16.png';
-import { GameMap } from './gamemap';
+import { GameMap, MapFactory } from './gamemap';
 const clamp = (val, low, high) => Math.max(low, Math.min(val, high));
 
 const DrawManager = {
@@ -57,17 +57,22 @@ window.onload = () => {
     };
     
     const terminal = new Terminal.RetroTerminal(displayOptions);
+    const testMap = MapFactory.drunkWalk(100, 75, "test-map", "Test Map");
     GameManager.addMap(testMap);
     GameManager.curMap = "test-map";
     const tempCenter = {x: 25, y: 25};
+    const tempGlyph = new Glyph('X', Terminal.Color.Yellow);
     
     terminal.clear();
     for (let x=0; x<terminal.width; x++) {
         for (let y=0; y<terminal.height; y++) {
-            const mapPoint = DrawManager._screenToMap(game.curMap, {x, y}, tempCenter, terminal);
+            const mapPoint = DrawManager._screenToMap(GameManager.curMap, {x, y}, tempCenter, terminal);
             const t = GameManager.curMap.getTile(mapPoint.x, mapPoint.y);
             if (t.glyph != null) {
                 DrawManager.drawAtPosition({x, y}, t.glyph, terminal);
+            }
+            if (mapPoint.x === tempCenter.x && mapPoint.y === tempCenter.y) {
+                DrawManager.drawAtPosition({x, y}, tempGlyph, terminal);
             }
         }
     }

@@ -1,4 +1,5 @@
-import { Util, FOV, Pathfinding, Terminal, Glyph} from 'malwoden';
+import { Util, FOV, Pathfinding, Terminal, Glyph, Generation} from 'malwoden';
+import { GameManager } from './game';
 
 export class Tile {
     constructor(glyph, color, walk=true, see=true) {
@@ -79,6 +80,36 @@ export class GameMap {
     isTransparent(x, y) {
         const t = this.getTile(x, y);
         return t.see;
+    }
+}
+
+export const MapFactory = {
+    drunkWalk(width, height, id, name, dark) {
+        const gameMap = new GameMap(width, height, id, name, dark);
+        const gen = new Generation.DrunkardsWalk({
+            width: gameMap.width,
+            height: gameMap.height,
+            rng: GameManager.rng,
+            topology: "four"
+        });
+
+        gen.walkSteps({
+            start: {x: Math.floor(width/2), y: Math.floor(height/2)},
+            steps: Infinity, 
+            maxCoveredTiles: Math.floor(width * height * 0.4),
+        });
+
+        for (let x=0; x<gen.table.width; x++) {
+            for (let y=0; y<gen.table.height; y++) {
+                if (gen.table.get({x, y}) === 1) {
+                    gameMap.setTile(x, y, 1);
+                } else {
+                    gameMap.setTile(x, y, 2);
+                }
+            }
+        }
+
+        return gameMap;
     }
 }
 

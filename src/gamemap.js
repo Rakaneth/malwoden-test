@@ -53,7 +53,7 @@ export class GameMap {
 
     setTile(x, y, tileCode) {
         this._tiles.set({x, y}, tileCode);
-        if (tileCode === 2) {
+        if (tileCode === 1) {
             this._floors.push({x, y});
         } else {
             this._floors = this._floors.filter(e => !(e.x === x && e.y === y));

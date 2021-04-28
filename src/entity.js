@@ -1,18 +1,28 @@
-import { Glyph} from "malwoden";
+import { Color, Glyph} from "malwoden";
 
-class Entity {
-    constructor(id, opts) {
+export class Entity {
+    constructor(id, layer, opts) {
         this._x = 0;
         this._y = 0;
         this._id = id;
         this._name = opts.name || "No name";
         this._desc = opts.desc || "No desc";
-        this._glyph = opts.glyph || Glyph.fromCharCode(CharCode.at);
-        this._layer = opts.layer || 0;
+        if (opts.glyph) {
+            const [r, g, b] = opts.glyph.color;
+            const color = new Color(r, g, b);
+            const glyph = new Glyph(opts.glyph.char, color);
+            this._glyph = glyph;
+        } else {
+            this._glyph = Glyph.fromCharCode(CharCode.at);
+        }
+        this._layer = layer;
         this._components = {};
         this._groups = {};
         this._mapID = "none";
-        this._tags = opts.tags || new Set();
+        this._tags = new Set();
+        if (opts.tags) {
+            opts.tags.forEach(t => this._tags.add(t));
+        }
         if (opts.components) {
             for (let c of opts.components) {
                 this.applyComponent(c);
@@ -26,6 +36,7 @@ class Entity {
     get desc() { return this._desc; }
     get glyph() { return this._glyph; }
     get layer() { return this._layer; }
+    get id() { return this._id; }
 
     applyComponent(component) {
         for (let k in component) {
@@ -71,7 +82,7 @@ class Entity {
     }
 
     hasTag(tag) {
-        return this._tags.includes(tag);
+        return this._tags.has(tag);
     }
 
     moveTo(x, y, mapID=null) {

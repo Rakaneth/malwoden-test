@@ -42,9 +42,14 @@ class Game {
         }
     }
 
-    getEntityAt(x, y, mapID) {
-        const pred = (e) => e.x === x && e.y === y && e.mapID === mapID;
-        return Object.values(this._entities).find(pred);
+    getEntitiesAt(x, y, mapID) {
+        if (mapID == null) {
+            mapID = this._curMapId;
+        }
+        const pred = (e) => {
+            return e.pos.x === x && e.pos.y === y && e.mapID === mapID;
+        };
+        return Object.values(this._entities).filter(pred);
     }
 }
 

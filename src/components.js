@@ -26,4 +26,4 @@ export const Healing = new Mixin("healing", "consumable", {
     }
 });
 
-//stat-based attributes (players, equipment)
+//stat-based attributes (players, equipmen

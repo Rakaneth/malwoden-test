@@ -1,7 +1,7 @@
 export class Mixin {
-    constructor(name, group, data = {}) {
+    constructor(name, groups, data = {}) {
         this.name = name;
-        this.group = group;
+        this.groups = groups;
         for (let prop in data) {
             let propDesc = Object.getOwnPropertyDescriptor(data, prop);
             if (propDesc.get || propDesc.set) {

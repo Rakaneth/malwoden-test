@@ -1,4 +1,5 @@
 import { Color, Glyph} from "malwoden";
+import { GameManager } from "./game";
 
 export class Entity {
     constructor(id, layer, opts) {
@@ -28,6 +29,19 @@ export class Entity {
                 this.applyComponent(c);
             }
         }
+
+        if (opts.egos) {
+            for (let chance in opts.egos) {
+                const ego = opts.egos[chance]
+                const c = parseInt(chance, 10);
+                const check = GameManager.pctChance(c);
+                const canPrefix = !this.has("prefix") && ego.isPrefix;
+                const canSuffix = !this.has("suffix") && ego.isSuffix;
+                if (check && (canPrefix || canSuffix)) {
+                    this.applyComponent(ego);
+                }
+            }
+        }
     }
 
     get pos() { return {x: this._x, y: this._y}};
@@ -40,7 +54,14 @@ export class Entity {
 
     applyComponent(component) {
         for (let k in component) {
-            const excludeProps = ['init', 'group', 'name', 'stats'];
+            const excludeProps = [
+                'init', 
+                'groups', 
+                'name', 
+                'stats', 
+                'isPrefix', 
+                'isSuffix'
+            ];
             if (!(excludeProps.includes(k) || this.hasOwnProperty(k))) {
                 const propDesc = Object.getOwnPropertyDescriptor(component, k);
                 if (propDesc.get || propDesc.set) {
@@ -71,9 +92,9 @@ export class Entity {
         }
 
         if (component.isSuffix) {
-            this._name = `${component.name} ${this._name}`;
+            this._name = `${this._name} ${component.name}`;
         } else if (component.isPrefix) {
-            this._name = `${this._name} ${component.name}`
+            this._name = `${component.name} ${this._name}`
         }
     }
 

@@ -1,6 +1,7 @@
 import { Blocker } from "./components";
 import { Entity } from './entity';
 import { GameManager } from './game';
+import { Ferocity, Savage } from './egos'
 
 const CREATURES = {
     wolf: {
@@ -12,6 +13,10 @@ const CREATURES = {
         },
         components: [Blocker],
         tags: ["wolf", "animal"],
+        egos: {
+            75: Savage,
+            45: Ferocity,
+        }
     },
     rogue: {
         name: "rogue",
@@ -22,6 +27,10 @@ const CREATURES = {
         },
         components: [Blocker],
         tags: ["human"],
+        egos: {
+            10: Savage,
+            5: Ferocity,
+        }
     }
 }
 

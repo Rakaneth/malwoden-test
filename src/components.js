@@ -25,5 +25,3 @@ export const Healing = new Mixin("healing", "consumable", {
         //TODO: define healing item use
     }
 });
-
-//stat-based attributes (players, equipmen

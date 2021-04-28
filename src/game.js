@@ -51,6 +51,10 @@ class Game {
         };
         return Object.values(this._entities).filter(pred);
     }
+
+    pctChance(pct) {
+        return this.rng.nextInt(0, 99) < pct;
+    }
 }
 
 export const GameManager = new Game();

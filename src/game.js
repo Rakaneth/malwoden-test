@@ -38,7 +38,7 @@ class Game {
         if (typeof(entity) === 'object') {
             delete this._entities[entity.id];
         } else if (typeof(entity) === 'string') {
-            delete entities[entity];
+            delete this._entities[entity];
         }
     }
 

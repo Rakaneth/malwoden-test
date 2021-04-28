@@ -99,7 +99,7 @@ export class Entity {
     }
 
     has(componentOrGroup) {
-        return this._components[entityOrGroup] || this._groups[entityOrGroup];
+        return this._components[componentOrGroup] || this._groups[componentOrGroup];
     }
 
     hasTag(tag) {

@@ -44,6 +44,8 @@ class Game {
         }
     }
 
+    getEntity(eID) { return this._entities[eID]; }
+
     getEntitiesAt(point, mapID) {
         if (mapID == null) {
             mapID = this._curMapId;

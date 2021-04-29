@@ -24,10 +24,10 @@ class Game {
         return this._entities["player"];
     }
 
-    set curMap(newMap) {
-        this._curMapId = newMap;
+    set curMap(newMapId) {
+        this._curMapId = newMapId;
     }
-    
+
     addMap(m) {
         this._maps[m.id] = m;
     }

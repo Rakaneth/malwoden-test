@@ -2,6 +2,7 @@ import { Blocker, Player } from "./components";
 import { Entity } from './entity';
 import { GameManager } from './game';
 import { CREATURES } from "./creatures";
+import { cloneDeep } from 'lodash';
 
 let idCounter = 0;
 
@@ -31,7 +32,7 @@ export function seed(gameMap, entity) {
 
 export const EntityFactory = {
     makeCreature(buildID, eType, id=null) {
-        const template = CREATURES[buildID];
+        const template = cloneDeep(CREATURES[buildID]);
         const creatureID = id || _makeID(buildID)
         const e = new Entity(creatureID, eType.layer, template);
         if (eType.components) {
@@ -42,7 +43,14 @@ export const EntityFactory = {
         return e;
     },
 
-    randomFrom(repo) {
+    makePlayer(buildID, playerName, playerDesc) {
+        const template = cloneDeep(CREATURES[buildID]);
+        template.name = playerName;
+        template.desc = playerDesc;
+        return this.makeCreature(buildID, EntityType.PLAYER, "player");
+    },
+
+    _randomTemplateFrom(repo) {
         const [buildID, template] = GameManager.weightedItem(repo, (t) => t.freq || 0);
         const eID = _makeID(buildID);
 

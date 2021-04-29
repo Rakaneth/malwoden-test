@@ -20,7 +20,7 @@ export const CREATURES = {
         desc: "A lurking bandit",
         glyph: {
             char: '@',
-            color: [191, 0, 191],
+            color: [100, 0, 100],
         },
         tags: ["human"],
         egos: {
@@ -28,5 +28,18 @@ export const CREATURES = {
             5: Ferocity,
         },
         freq: 5,
+    },
+    cultist: {
+        name: "cultist",
+        desc: "A mysterious, hooded figure",
+        glyph: {
+            char: '@',
+            color: [191, 0, 191]
+        },
+        tags: ["human", "cult"],
+        egos: {
+            5: Savage,
+        },
+        freq: 3
     }
 }

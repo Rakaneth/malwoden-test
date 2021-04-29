@@ -68,9 +68,11 @@ class Game {
         const sum = Object.values(tbl)
             .reduce((a, b) => weightFn(a) + weightFn(b), 0);
         const roll = this._rng.nextInt(0, sum-1);
+        let acc = 0;
         for (let k in tbl) {
-            let o = tbl[k]
-            if (weightFn(o) < roll) {
+            let o = tbl[k];
+            acc += weightFn(o);
+            if (roll < acc) {
                 return [k, o];
             }
         }

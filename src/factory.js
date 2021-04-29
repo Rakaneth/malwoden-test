@@ -50,10 +50,13 @@ export const EntityFactory = {
         return this.makeCreature(buildID, EntityType.PLAYER, "player");
     },
 
+    randomCreature() {
+        const buildID = cloneDeep(this._randomTemplateFrom(CREATURES));
+        return this.makeCreature(buildID, EntityType.CREATURE);
+    },
+
     _randomTemplateFrom(repo) {
-        const [buildID, template] = GameManager.weightedItem(repo, (t) => t.freq || 0);
-        const eID = _makeID(buildID);
-
+        const [buildID, _] = GameManager.weightedItem(repo, (t) => t.freq || 0);
+        return buildID;
     }
-
 }

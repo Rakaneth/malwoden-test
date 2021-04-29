@@ -25,9 +25,9 @@ window.onload = () => {
     const testMap = MapFactory.drunkWalk(100, 75, "test-map", "Test Map");
     GameManager.addMap(testMap);
     GameManager.curMap = "test-map";
-    const e1 = EntityFactory.makeCreature('wolf', EntityType.CREATURE);
-    const e2 = EntityFactory.makeCreature('rogue', EntityType.CREATURE);
-    const player = EntityFactory.makeCreature('rogue', EntityType.PLAYER, "player");
+    const e1 = EntityFactory.randomCreature();
+    const e2 = EntityFactory.randomCreature();
+    const player = EntityFactory.makePlayer('rogue');
     seed(GameManager.curMap, e1);
     seed(GameManager.curMap, e2);
     seed(GameManager.curMap, player);

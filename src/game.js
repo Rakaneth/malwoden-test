@@ -6,8 +6,10 @@ class Game {
         this._entities = {};
         this._maps = {};
         this._curMapId = "none";
-        this.rng = new Rand.AleaRNG();
+        this._rng = new Rand.AleaRNG();
     }
+
+    get rng() { return this._rng; }
 
     get curMap() {
         return this._maps[this._curMapId];
@@ -42,18 +44,36 @@ class Game {
         }
     }
 
-    getEntitiesAt(x, y, mapID) {
+    getEntitiesAt(point, mapID) {
         if (mapID == null) {
             mapID = this._curMapId;
         }
-        const pred = (e) => {
-            return e.pos.x === x && e.pos.y === y && e.mapID === mapID;
-        };
+        const pred = (e) => e.isAt(point, mapID);
         return Object.values(this._entities).filter(pred);
+    }
+
+    getBlockerAt(point, mapID) {
+        if (mapID == null) {
+            mapID = this._curMapId;
+        }
+        const pred = (e) => e.isAt(point, mapID) && e.has('blocker');
+        return Object.values(this._entities).find(pred);
     }
 
     pctChance(pct) {
         return this.rng.nextInt(0, 99) < pct;
+    }
+
+    weightedItem(tbl, weightFn) {
+        const sum = Object.values(tbl)
+            .reduce((a, b) => weightFn(a) + weightFn(b), 0);
+        const roll = this._rng.nextInt(0, sum-1);
+        for (let k in tbl) {
+            let o = tbl[k]
+            if (weightFn(o) < roll) {
+                return [k, o];
+            }
+        }
     }
 }
 

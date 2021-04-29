@@ -1,40 +1,23 @@
-import { Blocker } from "./components";
+import { Blocker, Player } from "./components";
 import { Entity } from './entity';
 import { GameManager } from './game';
-import { Ferocity, Savage } from './egos'
-
-const CREATURES = {
-    wolf: {
-        name: "wolf",
-        desc: "A large wolf",
-        glyph: {
-            char: 'w',
-            color: [192, 101, 97],
-        },
-        components: [Blocker],
-        tags: ["wolf", "animal"],
-        egos: {
-            75: Savage,
-            45: Ferocity,
-        }
-    },
-    rogue: {
-        name: "rogue",
-        desc: "A lurking bandit",
-        glyph: {
-            char: '@',
-            color: [191, 0, 191],
-        },
-        components: [Blocker],
-        tags: ["human"],
-        egos: {
-            10: Savage,
-            5: Ferocity,
-        }
-    }
-}
+import { CREATURES } from "./creatures";
 
 let idCounter = 0;
+
+export const EntityType = {
+    PLAYER: {
+        layer: 3,
+        components: [Player, Blocker] //TODO: Vision
+    },
+    CREATURE: {
+        layer: 2,
+        components: [Blocker] //TODO: Vision
+    },
+    ITEM: {
+        layer: 1,
+    }
+}
 
 function _makeID(name) {
     return `${name}-${idCounter++}`;
@@ -47,8 +30,22 @@ export function seed(gameMap, entity) {
 }
 
 export const EntityFactory = {
-    makeCreature(creatureID) {
-        const template = CREATURES[creatureID];
-        return new Entity(_makeID(creatureID), 2, template);
+    makeCreature(buildID, eType, id=null) {
+        const template = CREATURES[buildID];
+        const creatureID = id || _makeID(buildID)
+        const e = new Entity(creatureID, eType.layer, template);
+        if (eType.components) {
+            for (let c of eType.components) {
+                e.applyComponent(c);
+            }
+        }
+        return e;
     },
+
+    randomFrom(repo) {
+        const [buildID, template] = GameManager.weightedItem(repo, (t) => t.freq || 0);
+        const eID = _makeID(buildID);
+
+    }
+
 }

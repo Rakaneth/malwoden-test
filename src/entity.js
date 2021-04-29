@@ -118,4 +118,8 @@ export class Entity {
         this._x += dx;
         this._y += dy;
     }
+
+    isAt(p, mapID) {
+        return this._x === p.x && this._y === p.y && this._mapID === mapID;
+    }
 }

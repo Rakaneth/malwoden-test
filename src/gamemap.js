@@ -38,47 +38,47 @@ export class GameMap {
     get width() { return this._tiles.width; }
     get height() { return this._tiles.height; }
     
-    inBounds(x, y) {
-        return x >= 0 && x < this.width && y >= 0 && y < this.height;
+    inBounds(p) {
+        return p.x >= 0 && p.x < this.width && p.y >= 0 && p.y < this.height;
     }
     
-    getTile(x, y) {
-        if (this.inBounds(x, y)) {
-            const idx = this._tiles.get({x, y});
+    getTile(p) {
+        if (this.inBounds(p)) {
+            const idx = this._tiles.get(p);
             return GameMap.TILES[idx];
         }
 
         return GameMap.TILES[0];
     }
 
-    setTile(x, y, tileCode) {
-        this._tiles.set({x, y}, tileCode);
+    setTile(p, tileCode) {
+        this._tiles.set(p, tileCode);
         if (tileCode === 1) {
-            this._floors.push({x, y});
+            this._floors.push(p);
         } else {
-            this._floors = this._floors.filter(e => !(e.x === x && e.y === y));
+            this._floors = this._floors.filter(e => !(e.x === p.x && e.y === p.y));
         }
     }
 
-    isExplored(x, y) {
-        return this._explored.get({x, y});
+    isExplored(p) {
+        return this._explored.get(p);
     }
 
-    explore(x, y) {
-        this._explored.set({x, y}, true);
+    explore(p) {
+        this._explored.set(p, true);
     }
 
     getRandomFloor(rng) {
         return rng.nextItem(this._floors);
     }
 
-    isWalkable(x, y) {
-        const t = this.getTile(x, y);
+    isWalkable(p) {
+        const t = this.getTile(p);
         return t.walk;
     }
 
-    isTransparent(x, y) {
-        const t = this.getTile(x, y);
+    isTransparent(p) {
+        const t = this.getTile(p);
         return t.see;
     }
 }
@@ -86,13 +86,13 @@ export class GameMap {
 export const MapFactory = {
     _wallBounds(gameMap) {
         for(let x=0; x<gameMap.width; x++) {
-            gameMap.setTile(x, 0, 2);
-            gameMap.setTile(x, gameMap.height-1, 2);
+            gameMap.setTile({x, y:0}, 2);
+            gameMap.setTile({x, y:gameMap.height-1}, 2);
         }
 
         for (let y=0; y<gameMap.height; y++) {
-            gameMap.setTile(0, y, 2);
-            gameMap.setTile(gameMap.width-1, y, 2);
+            gameMap.setTile({x: 0, y}, 2);
+            gameMap.setTile({x: gameMap.width-1, y}, 2);
         }
     },
 
@@ -111,12 +111,15 @@ export const MapFactory = {
             maxCoveredTiles: Math.floor(width * height * 0.4),
         });
 
+        let p;
+
         for (let x=0; x<gen.table.width; x++) {
             for (let y=0; y<gen.table.height; y++) {
-                if (gen.table.get({x, y}) === 1) {
-                    gameMap.setTile(x, y, 1);
+                p = {x, y};
+                if (gen.table.get(p) === 1) {
+                    gameMap.setTile(p, 1);
                 } else {
-                    gameMap.setTile(x, y, 2);
+                    gameMap.setTile(p, 2);
                 }
             }
         }

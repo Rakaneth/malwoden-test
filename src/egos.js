@@ -1,19 +1,22 @@
 import { Mixin } from './mixin'
 
-export const Savage = new Mixin("savage", "ego,prefix,creature-ego", {
+const suffixEgos = "ego,suffix,creature-ego";
+const prefixEgos = "ego,prefix,creature-ego";
+
+export const Savage = new Mixin("savage", prefixEgos, {
     stats: {
-        str: 2,
-        stam: 1,
-        smt: -1,
+        _str: 2,
+        _stam: 1,
+        _smt: -1,
     },
     isPrefix: true,
 })
 
-export const Ferocity = new Mixin("of ferocity", "ego,suffix,creature-ego", {
+export const Ferocity = new Mixin("of ferocity", suffixEgos, {
     stats: {
-        spd: 2,
-        stam: 1,
-        sag: -1,
+        _spd: 2,
+        _stam: 1,
+        _sag: -1,
     },
     isSuffix: true,
 });

@@ -1,5 +1,6 @@
 import { Color, Glyph, Input } from 'malwoden';
 import { GameManager } from './game';
+import { GameMap } from './gamemap';
 import { clamp } from './utils';
 
 export class Screen {
@@ -28,6 +29,7 @@ export class Screen {
         const that = this;
         return function() {
             fn(...args);
+            GameManager.updateFOV();
             that.render();
         }
     }
@@ -101,9 +103,16 @@ export class MainScreen extends Screen {
                 screenPos = {x: sx, y: sy};
                 mapPos = this._screenToMap(GameManager.curMap, screenPos);
                 const t = GameManager.curMap.getTile(mapPos);
-                //TODO: darkness/vision/explore
-                if (t.glyph != null) {
-                    this._drawAtPosition(screenPos, t.glyph);
+                if (t.glyph !== null) {
+                    //it's a real map tile
+                    if (GameManager.player.canSee(mapPos)) {
+                        //we can see it, draw normally
+                        this._drawAtPosition(screenPos, t.glyph)
+                    } else if (GameManager.curMap.isExplored(mapPos)) {
+                        //we've explored it, so we remember the layout
+                        const darkGlyph = Glyph.fromCharCode(t.glyph.char, Color.DarkBlue);
+                        this._drawAtPosition(screenPos, darkGlyph);
+                    }
                 }
             }
         }
@@ -112,18 +121,21 @@ export class MainScreen extends Screen {
     _renderEntities() {
         let blocker;
         for (let entity of GameManager.curEntities) {
-            const sPos = this._mapToScreen(GameManager.curMap, entity.pos);
-            blocker = GameManager.getBlockerAt(entity.pos);
-            if (blocker) {
-                //if there is a blocker, draw the blocker
-                this._drawAtPosition(sPos, blocker.glyph);
-            } else if (GameManager.getEntitiesAt(entity.pos).length > 1) {
-                //if multiple entities, draw a *
-                const glyph = new Glyph('*', Color.Yellow);
-                this._drawAtPosition(sPos, glyph);
-            } else {
-                //only one entity, draw it
-                this._drawAtPosition(sPos, entity.glyph);
+            if (GameManager.player.canSee(entity)) {
+                //if entity is in FOV
+                const sPos = this._mapToScreen(GameManager.curMap, entity.pos);
+                blocker = GameManager.getBlockerAt(entity.pos);
+                if (blocker) {
+                    //if there is a blocker, draw the blocker
+                    this._drawAtPosition(sPos, blocker.glyph);
+                } else if (GameManager.getEntitiesAt(entity.pos).length > 1) {
+                    //if multiple entities, draw a *
+                    const glyph = new Glyph('*', Color.Yellow);
+                    this._drawAtPosition(sPos, glyph);
+                } else {
+                    //only one entity, draw it
+                    this._drawAtPosition(sPos, entity.glyph);
+                }
             }
         }
     }

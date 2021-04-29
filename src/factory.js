@@ -1,4 +1,4 @@
-import { Blocker, Player } from "./components";
+import { Blocker, Player, Vision } from "./components";
 import { Entity } from './entity';
 import { GameManager } from './game';
 import { CREATURES } from "./creatures";
@@ -9,11 +9,11 @@ let idCounter = 0;
 export const EntityType = {
     PLAYER: {
         layer: 3,
-        components: [Player, Blocker] //TODO: Vision
+        components: [Player, Blocker, Vision] //TODO: Vision
     },
     CREATURE: {
         layer: 2,
-        components: [Blocker] //TODO: Vision
+        components: [Blocker, Vision] //TODO: Vision
     },
     ITEM: {
         layer: 1,
@@ -37,7 +37,7 @@ export const EntityFactory = {
         const e = new Entity(creatureID, eType.layer, template);
         if (eType.components) {
             for (let c of eType.components) {
-                e.applyComponent(c);
+                e.applyComponent(c, template);
             }
         }
         return e;

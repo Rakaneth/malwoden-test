@@ -22,7 +22,7 @@ window.onload = () => {
     };
     
     const terminal = new Terminal.RetroTerminal(displayOptions);
-    const testMap = MapFactory.drunkWalk(100, 75, "test-map", "Test Map");
+    const testMap = MapFactory.drunkWalk(100, 75, "test-map", "Test Map", true);
     GameManager.addMap(testMap);
     GameManager.curMap = "test-map";
     const e1 = EntityFactory.randomCreature();
@@ -36,6 +36,7 @@ window.onload = () => {
     const keyboard = new Input.KeyboardHandler();
     keyboard.setContext(curScreen.keyboardContext);
 
+    GameManager.updateFOV();
     curScreen.render();
 }
 

@@ -13,6 +13,7 @@ export const CREATURES = {
             75: Savage,
             45: Ferocity,
         },
+        vision: 10,
         freq: 10,
     },
     rogue: {

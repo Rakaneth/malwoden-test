@@ -30,6 +30,11 @@ export class GameMap {
         this._floors = [];
         this._explored = new Util.Table(width, height);
         this._explored.fill(false);
+        const fovOptions = {
+            topology: "four",
+            lightPasses: this.isTransparent.bind(this),
+        };
+        this._fov = new FOV.PreciseShadowcasting(fovOptions);
     }
 
     get dark() { return this._dark; }
@@ -80,6 +85,19 @@ export class GameMap {
     isTransparent(p) {
         const t = this.getTile(p);
         return t.see;
+    }
+
+    updateFOV(entity) {
+        entity.inView = [];
+        const cb = (pos, range, vis) => {
+            if (vis > 0 && this.inBounds(pos)) {
+                entity.inView.push(pos);
+                if (entity.has('player')) {
+                    this.explore(pos);
+                }
+            }
+        }
+        this._fov.calculateCallback(entity.pos, entity.vision, cb);
     }
 }
 

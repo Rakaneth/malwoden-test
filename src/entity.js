@@ -26,7 +26,7 @@ export class Entity {
         }
         if (opts.components) {
             for (let c of opts.components) {
-                this.applyComponent(c);
+                this.applyComponent(c, opts);
             }
         }
 
@@ -38,7 +38,7 @@ export class Entity {
                 const canPrefix = !this.has("prefix") && ego.isPrefix;
                 const canSuffix = !this.has("suffix") && ego.isSuffix;
                 if (check && (canPrefix || canSuffix)) {
-                    this.applyComponent(ego);
+                    this.applyComponent(ego, opts);
                 }
             }
         }
@@ -52,7 +52,7 @@ export class Entity {
     get layer() { return this._layer; }
     get id() { return this._id; }
 
-    applyComponent(component) {
+    applyComponent(component, opts) {
         for (let k in component) {
             const excludeProps = [
                 'init', 

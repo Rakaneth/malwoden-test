@@ -74,11 +74,14 @@ export const Inventory = new Mixin('inventory', 'inventory', {
 export const Vision = new Mixin('vision', 'vision', {
     init(opts) {
         this._vision = opts.vision || 6;
-        this._inView = [];
+        this.inView = [];
     },
+
+    get vision() { return this._vision; },
 
     canSee(ptOrEntity) {
         const pt = ptOrEntity.pos || ptOrEntity;
-        return this._inView.some(p => p.x === pt.x && p.y === pt.y);
+        const mapDark = GameManager.curMap.dark;
+        return !mapDark || this.inView.some(p => p.x === pt.x && p.y === pt.y);
     }
 });

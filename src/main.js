@@ -26,7 +26,7 @@ window.onload = () => {
     const bspTest = MapFactory.bsp(130, 82, "bspTest", "BSP Test", true);
     GameManager.addMap(testMap);
     GameManager.addMap(bspTest);
-    GameManager.curMap = "bspTest";
+    GameManager.curMap = "test-map";
     const e1 = EntityFactory.randomCreature();
     const e2 = EntityFactory.randomCreature();
     const player = EntityFactory.makePlayer('rogue');

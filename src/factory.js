@@ -25,7 +25,7 @@ function _makeID(name) {
 }
 
 export function seed(gameMap, entity) {
-    const pos = gameMap.getRandomFloor(GameManager.rng);
+    const pos = gameMap.getRandomFloor();
     entity.moveTo(pos.x, pos.y, gameMap.id);
     GameManager.addEntity(entity);
 }

@@ -13,12 +13,14 @@ export class Tile {
 const NULL_TILE = new Tile(null, false, false);
 const WALL_STONE = new Tile(Glyph.fromCharCode(0x23, Terminal.Color.Gray), false, false);
 const FLOOR_STONE = new Tile(Glyph.fromCharCode(0x2E, Terminal.Color.Gray));
+const WATER_DEEP = new Tile(Glyph.fromCharCode(0x7E, Terminal.Color.White, Terminal.Color.Blue), false, true);
 
 export class GameMap {
     static TILES = [
         NULL_TILE,
         FLOOR_STONE,
         WALL_STONE,
+        WATER_DEEP
     ];
     
     constructor(width, height, id, name, dark=false) {
@@ -74,8 +76,8 @@ export class GameMap {
         this._explored.set(p, true);
     }
 
-    getRandomFloor(rng) {
-        return rng.nextItem(this._floors);
+    getRandomFloor() {
+        return GameManager.rng.nextItem(this._floors);
     }
 
     isWalkable(p) {
@@ -140,6 +142,46 @@ export const MapFactory = {
         }
     },
 
+    /**
+     * 
+     * @param {GameMap} gameMap The `GameMap` to add water to.
+     * @param {*} waterOpts Water config options.
+     * @param {number} waterOpts.maxPools The maximum number of pools to generate. Defaults to 3.
+     * @param {number} waterOpts.maxPoolSize The max size, in individual tiles,
+     * of a single pool. Defaults to 25.
+     */
+    _addWater(gameMap, waterOpts) {
+        const opts = waterOpts || {
+            maxPools: 3,
+            maxPoolSize: 25,
+        };
+
+        const maxPools = opts.maxPools || 3;
+        const maxPoolSize = opts.maxPoolSize || 25;
+
+        const gen = new Generation.DrunkardsWalk({
+            width: gameMap.width,
+            height: gameMap.height,
+            rng: GameManager.rng,
+            topology: "four"
+        });
+
+        const numIterations = GameManager.rng.nextInt(1, maxPools);
+
+        for (let i=0; i<numIterations; i++) {
+            const walkStart = gameMap.getRandomFloor();
+            gen.walkSteps({
+                start: walkStart,
+                maxCoveredTiles: maxPoolSize,
+                steps: Infinity,
+            });
+            const filled = gen.table.floodFillSelect(walkStart, 1);
+            for (let p of filled) {
+                gameMap.setTile(p, 3);
+            }
+        }
+    },
+
     drunkWalk(width, height, id, name, dark) {
         const gameMap = new GameMap(width, height, id, name, dark);
         const gen = new Generation.DrunkardsWalk({
@@ -169,6 +211,7 @@ export const MapFactory = {
         }
 
         this._wallBounds(gameMap);
+        this._addWater(gameMap);
 
         return gameMap;
     },

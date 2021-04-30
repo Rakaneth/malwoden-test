@@ -40,3 +40,28 @@ export class Rect {
             || this.y2 > other.y1);
     }
 }
+
+/**
+ * Chops `s` into an array of strings no longer than `maxLength`
+ * @param {string} s 
+ * @param {number} maxLength 
+ * @returns {Array<string>} an array of strings no longer than `maxLength`
+ */
+export function wrap(s, maxLength) {
+    const result = [];
+    let curLine = "";
+    const words = s.split(/\s+/);
+    for (let word of words) {
+        if (word.length + curLine.length > maxLength) {
+            result.push(curLine.trim());
+            curLine = `${word} `;
+        } else {
+            curLine += `${word} `;
+        }
+    }
+
+    if (curLine.length > 0) {
+        result.push(curLine.trim());
+    }
+    return result;
+}

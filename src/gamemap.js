@@ -3,15 +3,14 @@ import { GameManager } from './game';
 import { BSPNode, bspSplit, inOrder } from './bsp';
 
 export class Tile {
-    constructor(glyph, color, walk=true, see=true) {
+    constructor(glyph, walk=true, see=true) {
         this.glyph = glyph;
-        this.color = color;
         this.walk = walk;
         this.see = see;
     }
 }
 
-const NULL_TILE = new Tile(null, null, false, false);
+const NULL_TILE = new Tile(null, false, false);
 const WALL_STONE = new Tile(Glyph.fromCharCode(0x23, Terminal.Color.Gray), false, false);
 const FLOOR_STONE = new Tile(Glyph.fromCharCode(0x2E, Terminal.Color.Gray));
 
@@ -31,9 +30,10 @@ export class GameMap {
         this._floors = [];
         this._explored = new Util.Table(width, height);
         this._explored.fill(false);
+        const fovCB = this.isTransparent.bind(this);
         const fovOptions = {
             topology: "four",
-            lightPasses: this.isTransparent.bind(this),
+            lightPasses: fovCB,
         };
         this._fov = new FOV.PreciseShadowcasting(fovOptions);
     }

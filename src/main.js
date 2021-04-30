@@ -23,7 +23,7 @@ window.onload = () => {
     
     const terminal = new Terminal.RetroTerminal(displayOptions);
     const testMap = MapFactory.drunkWalk(100, 75, "test-map", "Test Map", true);
-    const bspTest = MapFactory.bsp(130, 82, "bspTest", "BSP Test");
+    const bspTest = MapFactory.bsp(130, 82, "bspTest", "BSP Test", true);
     GameManager.addMap(testMap);
     GameManager.addMap(bspTest);
     GameManager.curMap = "bspTest";

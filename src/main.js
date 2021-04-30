@@ -39,6 +39,9 @@ window.onload = () => {
     keyboard.setContext(curScreen.keyboardContext);
 
     GameManager.updateFOV();
+
+    GameManager.addMsg("The quick brown fox jumps over the lazy dog." +
+    " Sphinx of black quartz, judge my vow!");
     curScreen.render();
 }
 

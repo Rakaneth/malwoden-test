@@ -147,11 +147,20 @@ export class MainScreen extends Screen {
         this._terminal.writeAt({x: 0, y: 30}, `${mName} (${p.x},${p.y})`);
     }
 
+    _renderMsgs() {
+        if (GameManager.msgs.length > 0) {
+            let y = 0;
+            for (let s of GameManager.lastMsg) {
+                this._terminal.writeAt({x: 0, y}, s);
+                y++;
+            }
+        }
+    }
+
     _onRender() {
         this._renderMap();
         this._renderEntities();
         this._renderStats();
+        this._renderMsgs();
     }
-
-    
 }

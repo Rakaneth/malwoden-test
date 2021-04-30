@@ -1,4 +1,5 @@
 import { Rand } from 'malwoden';
+import { wrap } from './utils';
 
 class Game {
     constructor() {
@@ -7,6 +8,7 @@ class Game {
         this._maps = {};
         this._curMapId = "none";
         this._rng = new Rand.AleaRNG();
+        this._msgs = [];
     }
 
     get rng() { return this._rng; }
@@ -24,6 +26,14 @@ class Game {
         return this._entities["player"];
     }
 
+    get lastMsg() {
+        return this._msgs[this._msgs.length-1];
+    }
+
+    get msgs() {
+        return this._msgs;
+    }
+
     set curMap(newMapId) {
         this._curMapId = newMapId;
     }
@@ -34,6 +44,11 @@ class Game {
 
     addEntity(entity) {
         this._entities[entity.id] = entity;
+    }
+
+    addMsg(msg) {
+        const msgAry = wrap(msg, 50);
+        this._msgs.push(msgAry);
     }
 
     removeEntity(entity) {

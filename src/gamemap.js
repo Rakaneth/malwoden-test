@@ -1,5 +1,6 @@
 import { Util, FOV, Pathfinding, Terminal, Glyph, Generation} from 'malwoden';
 import { GameManager } from './game';
+import { BSPNode, bspSplit, inOrder } from './bsp';
 
 export class Tile {
     constructor(glyph, color, walk=true, see=true) {
@@ -99,6 +100,31 @@ export class GameMap {
         }
         this._fov.calculateCallback(entity.pos, entity.vision, cb);
     }
+
+    carve(rect) {
+        for (let y=rect.y; y<=rect.y2; y++) {
+            for (let x=rect.x; x<=rect.x2; x++) {
+                this.setTile({x, y}, 1);
+            }
+        }
+    }
+
+    idx(pt) {
+        return pt.y * this.width + pt.x;
+    }
+
+    deIdx(idx) {
+        return {
+            x: idx % this.width,
+            y: Math.floor(idx / this.width)
+        };
+    }
+
+    carveIdx(idx) {
+        const pt = this.deIdx(idx);
+        this.setTile(pt, 1);
+    }
+
 }
 
 export const MapFactory = {
@@ -144,6 +170,32 @@ export const MapFactory = {
 
         this._wallBounds(gameMap);
 
+        return gameMap;
+    },
+
+    bsp(width, height, id, name, dark) {
+        const gameMap = new GameMap(width, height, id, name, dark);
+
+        //leave room for wall edge
+        const root = new BSPNode(1, 1, width-2, height-2);
+        const tree = bspSplit(root);
+
+        root.makeRooms();
+
+        const cb = (bspNode) => {
+            if (bspNode) {
+                if (bspNode.room) {
+                    gameMap.carve(bspNode.room);
+                } else {
+                    for (let step of Object.values(bspNode.path)) {
+                        gameMap.setTile(step, 1);
+                    }
+                }
+            }
+        };
+
+        inOrder(root, cb);
+        
         return gameMap;
     }
 }

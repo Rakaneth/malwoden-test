@@ -23,8 +23,10 @@ window.onload = () => {
     
     const terminal = new Terminal.RetroTerminal(displayOptions);
     const testMap = MapFactory.drunkWalk(100, 75, "test-map", "Test Map", true);
+    const bspTest = MapFactory.bsp(130, 82, "bspTest", "BSP Test");
     GameManager.addMap(testMap);
-    GameManager.curMap = "test-map";
+    GameManager.addMap(bspTest);
+    GameManager.curMap = "bspTest";
     const e1 = EntityFactory.randomCreature();
     const e2 = EntityFactory.randomCreature();
     const player = EntityFactory.makePlayer('rogue');

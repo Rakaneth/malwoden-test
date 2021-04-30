@@ -96,6 +96,12 @@ export class Entity {
         } else if (component.isPrefix) {
             this._name = `${component.name} ${this._name}`
         }
+
+        if (component.tags) {
+            for (let tag of component.tags) {
+                this._tags.add(tag);
+            }
+        }
     }
 
     has(componentOrGroup) {

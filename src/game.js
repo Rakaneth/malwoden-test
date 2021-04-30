@@ -83,6 +83,8 @@ class Game {
     updateFOV() {
         this.curMap.updateFOV(this.player);
     }
+
+    
 }
 
 export const GameManager = new Game();

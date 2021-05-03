@@ -1,6 +1,5 @@
 import { Color, Glyph, GUI, Input } from 'malwoden';
 import { GameManager } from './game';
-import { GameMap } from './gamemap';
 import { clamp, wrap } from './utils';
 
 export class Screen {

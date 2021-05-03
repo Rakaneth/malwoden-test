@@ -1,12 +1,13 @@
-import { Color, Glyph, Input } from 'malwoden';
+import { Color, Glyph, GUI, Input } from 'malwoden';
 import { GameManager } from './game';
 import { GameMap } from './gamemap';
-import { clamp } from './utils';
+import { clamp, wrap } from './utils';
 
 export class Screen {
     constructor(name, rootTeminal) {
         this._name = name;
         this._terminal = rootTeminal;
+        this._keyboardContext = null;
     }
 
     get name() { return this._name; }
@@ -22,7 +23,11 @@ export class Screen {
     }
 
     get keyboardContext() {
-        throw new Error(`Screen ${this._name} has not implemented a keyboard context`);
+        if (!this._keyboardContext) {
+            throw new Error(`Screen ${this._name} has not implemented a keyboard context`);
+            return null;
+        }
+        return this._keyboardContext;
     }
 
     renderCB(fn, ...args) {
@@ -42,7 +47,37 @@ function calc(p, m, s) {
     return clamp(p - Math.floor(s/2), 0, Math.max(0, m-s));
 }
 
+class ScreensManager {
+    constructor() {
+        this._screens = {}
+        this._curScreenID = "none";
+        this._keyboard = new Input.KeyboardHandler();
+    }
 
+    register(screen) {
+        this._screens[screen.name] = screen;
+    }
+
+    registerMany(terminal, ...screenTypes) {
+        for (let t of screenTypes) {
+            this.register(new t(terminal));
+        }
+    }
+
+    get curScreen() { return this._screens[this._curScreenID]; }
+    set curScreen(screenName) { 
+        this._curScreenID = screenName; 
+        this._keyboard.clearContext();
+        this._keyboard.setContext(this.curScreen.keyboardContext);
+        this.render();
+    }
+
+    render() {
+        this.curScreen.render();
+    }
+}
+
+export const ScreenManager = new ScreensManager();
 
 export class MainScreen extends Screen {
     
@@ -50,15 +85,17 @@ export class MainScreen extends Screen {
         super("main", rootTerminal);
         this._mapvp = rootTerminal.port({x: 0, y: 0}, MAP_W, MAP_H);
         const boundMoveBy = GameManager.player.moveBy.bind(GameManager.player);
+        const openMsgCB = () => {ScreenManager.curScreen = "message"; }
+        this._displayMsgs = false;
         this._keyboardContext = new Input.KeyboardContext()
             .onDown(Input.KeyCode.W, this.renderCB(boundMoveBy, 0, -1))
             .onDown(Input.KeyCode.A, this.renderCB(boundMoveBy, -1, 0))
             .onDown(Input.KeyCode.S, this.renderCB(boundMoveBy, 0, 1))
-            .onDown(Input.KeyCode.D, this.renderCB(boundMoveBy, 1, 0));
+            .onDown(Input.KeyCode.D, this.renderCB(boundMoveBy, 1, 0))
+            .onDown(Input.KeyCode.H, openMsgCB);
     }
 
     get center() { return GameManager.player.pos; }
-    get keyboardContext() { return this._keyboardContext; }
 
     _cam(gameMap) {
         return {
@@ -147,10 +184,11 @@ export class MainScreen extends Screen {
         this._terminal.writeAt({x: 0, y: 30}, `${mName} (${p.x},${p.y})`);
     }
 
-    _renderMsgs() {
+    _renderLastMsg() {
         if (GameManager.msgs.length > 0) {
             let y = 0;
-            for (let s of GameManager.lastMsg) {
+            let wrapped = wrap(GameManager.lastMsg, 50);
+            for (let s of wrapped) {
                 this._terminal.writeAt({x: 0, y}, s);
                 y++;
             }
@@ -161,6 +199,53 @@ export class MainScreen extends Screen {
         this._renderMap();
         this._renderEntities();
         this._renderStats();
-        this._renderMsgs();
+        this._renderLastMsg();
+        
+    }
+}
+
+export class MessageScreen extends Screen {
+    constructor(terminal) {
+        super("message", terminal);
+        this._downIdx = 0;
+        const upCB = () => { 
+            this._downIdx = clamp(this._downIdx-1, 0, GameManager.msgs.length-1);
+        };
+        const downCB = () => {
+            this._downIdx = clamp(this._downIdx + 1, 0, GameManager.msgs.length-1);
+        };
+        const escCB = () => { ScreenManager.curScreen = "main"; }
+        this._keyboardContext = new Input.KeyboardContext()
+            .onDown(Input.KeyCode.W, this.renderCB(upCB))
+            .onDown(Input.KeyCode.S, this.renderCB(downCB))
+            .onDown(Input.KeyCode.Escape, escCB);
+    }
+
+    _onRender() {
+        let i=0;
+        GUI.box(this._terminal, {
+            origin: {x: 0, y: 0},
+            width: 49,
+            height: 34,
+            title: "Messages",
+        });
+
+        let idx;
+
+        if (this._downIdx !== 0) {
+            idx = -this._downIdx;
+        }
+        
+        //some JS trickery here:
+        //idx remains undefined if this._downIdx is 0
+        //which makes slice return the whole array
+        for (let msg of GameManager.msgs.slice(0, idx).reverse()) {
+            let list = wrap(msg, 47);
+            if (list.length + i > 33) break;
+            for (let s of list) {
+                this._terminal.writeAt({x: 1, y: 1+i}, s);
+                i++;
+            } 
+        }
     }
 }

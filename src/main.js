@@ -7,7 +7,7 @@ import { MapFactory } from './gamemap';
 import { EntityFactory, EntityType, seed } from './factory';
 import { Entity } from './entity';
 import { clamp } from './utils';
-import { MainScreen } from './screen';
+import { MainScreen, MessageScreen, ScreenManager } from './screen';
 import { nextNormal, rollDice, testDiff, testNormal, testRollDice, testUniform } from './rng';
 
 window.onload = () => {
@@ -35,9 +35,9 @@ window.onload = () => {
     seed(GameManager.curMap, e2);
     seed(GameManager.curMap, player);
 
-    let curScreen = new MainScreen(terminal);
-    const keyboard = new Input.KeyboardHandler();
-    keyboard.setContext(curScreen.keyboardContext);
+    //ScreenManager.register(new MainScreen(terminal));
+    ScreenManager.registerMany(terminal, MainScreen, MessageScreen);
+    ScreenManager.curScreen = "main";
 
     //testNormal(1, 4, 2);
     //testNormal(1, 4, 5);
@@ -47,7 +47,11 @@ window.onload = () => {
 
     GameManager.addMsg("The quick brown fox jumps over the lazy dog." +
     " Sphinx of black quartz, judge my vow!");
-    curScreen.render();
+    for (let i=1; i<=50; i++) {
+        GameManager.addMsg(`Reasonably long message that is longer than forty-seven characters ${i}`);
+    }
+    GameManager.addMsg("Msg 51");
+    ScreenManager.render();
 }
 
 

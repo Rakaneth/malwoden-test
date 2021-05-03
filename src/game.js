@@ -44,8 +44,7 @@ class Game {
     }
 
     addMsg(msg) {
-        const msgAry = wrap(msg, 50);
-        this._msgs.push(msgAry);
+        this._msgs.push(msg);
     }
 
     removeEntity(entity) {

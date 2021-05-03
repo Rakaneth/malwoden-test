@@ -89,15 +89,19 @@ export function pctChance(pct) {
     return GameRNG.nextInt() < pct;
 }
 
-function testDiceHarness(fn, times, ...args) {
+function testDiceHarness(fn, testFn, times, ...args) {
     let lowest = Infinity;
     let highest = -Infinity;
     let rolls = [];
+    let sux = 0;
     for (let i=0; i<times; i++) {
         let roll = fn.apply(GameRNG, args);
         lowest = Math.min(lowest, roll);
         highest = Math.max(highest, roll);
         rolls.push(roll);
+        if (testFn) {
+            if (testFn(roll)) sux++;
+        }
     }
 
     rolls.sort((a, b) => a - b);
@@ -105,24 +109,30 @@ function testDiceHarness(fn, times, ...args) {
     console.log(`Lowest roll was ${lowest}`);
     console.log(`Highest roll was ${highest}`);
     console.log(`Rolls were ${rolls}`);
+    if (testFn) {
+        console.log(`Rolls succeeded ${sux}/${times}`);
+    }
 }
 
 export function testNormal(min, max, variance) {
     console.log(`Testing normal distribution for min=${min}, max=${max}, variance=${variance}`);
-    testDiceHarness(nextNormal, 100, min, max, variance);
+    testDiceHarness(nextNormal, null, 100, min, max, variance);
 }
 
 export function testUniform(min, max) {
     console.log(`Testing uniform distribution for min=${min}, max=${max}`);
-    testDiceHarness(GameRNG.nextInt, 100, min, max+1);
+    testDiceHarness(GameRNG.nextInt, null, 100, min, max+1);
 }
 
 export function testRollDice(diceString) {
     console.log(`Testing dice roll ${diceString}`);
-    testDiceHarness(rollDice, 100, diceString);
+    testDiceHarness(rollDice, null, 100, diceString);
 }
 
-export function testDiff(stat, variance) {
-    console.log(`Testing rolls of stat=${stat}, variance=${variance}`);
-    testDiceHarness(rollStat, 100, stat, variance);
+export function testDiff(stat, diff, variance) {
+    console.log(`Testing rolls of stat=${stat}, diff=${diff}, variance=${variance}`);
+    const cb = (roll) => roll >= diff;
+    testDiceHarness(rollStat, cb, 100, stat, variance);
 }
+
+

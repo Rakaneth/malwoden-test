@@ -41,7 +41,7 @@ window.onload = () => {
 
     //testNormal(1, 4, 2);
     //testNormal(1, 4, 5);
-    testDiff(10, 5);
+    testDiff(10, 5, 7);
 
     GameManager.updateFOV();
 

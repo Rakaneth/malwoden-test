@@ -3,6 +3,7 @@ import { Entity } from './entity';
 import { GameManager } from './game';
 import { CREATURES } from "./creatures";
 import { cloneDeep } from 'lodash';
+import { getWeightedItem } from './rng'
 
 let idCounter = 0;
 
@@ -56,7 +57,7 @@ export const EntityFactory = {
     },
 
     _randomTemplateFrom(repo) {
-        const [buildID, _] = GameManager.weightedItem(repo, (t) => t.freq || 0);
+        const [buildID, _] = getWeightedItem(repo, (t) => t.freq || 0);
         return buildID;
     }
 }

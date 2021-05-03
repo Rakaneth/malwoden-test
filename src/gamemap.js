@@ -1,6 +1,6 @@
-import { Util, FOV, Pathfinding, Terminal, Glyph, Generation} from 'malwoden';
-import { GameManager } from './game';
+import { Util, FOV, Terminal, Glyph, Generation} from 'malwoden';
 import { BSPNode, bspSplit, inOrder } from './bsp';
+import { MapRNG } from './rng';
 
 export class Tile {
     constructor(glyph, walk=true, see=true) {
@@ -68,6 +68,11 @@ export class GameMap {
         }
     }
 
+    isWall(p) {
+        const wallTiles = [2];
+        return wallTiles.includes(this._tiles.get(p));
+    }
+
     isExplored(p) {
         return this._explored.get(p);
     }
@@ -77,7 +82,7 @@ export class GameMap {
     }
 
     getRandomFloor() {
-        return GameManager.rng.nextItem(this._floors);
+        return MapRNG.nextItem(this._floors);
     }
 
     isWalkable(p) {
@@ -143,7 +148,7 @@ export const MapFactory = {
     },
 
     /**
-     * 
+     * Adds water to a map using Drunkard's Walk.
      * @param {GameMap} gameMap The `GameMap` to add water to.
      * @param {*} waterOpts Water config options.
      * @param {number} waterOpts.maxPools The maximum number of pools to generate. Defaults to 3.
@@ -158,17 +163,15 @@ export const MapFactory = {
 
         const maxPools = opts.maxPools || 3;
         const maxPoolSize = opts.maxPoolSize || 25;
-
-        const gen = new Generation.DrunkardsWalk({
-            width: gameMap.width,
-            height: gameMap.height,
-            rng: GameManager.rng,
-            topology: "four"
-        });
-
-        const numIterations = GameManager.rng.nextInt(1, maxPools);
+        const numIterations = MapRNG.nextInt(1, maxPools);
 
         for (let i=0; i<numIterations; i++) {
+            const gen = new Generation.DrunkardsWalk({
+                width: gameMap.width,
+                height: gameMap.height,
+                rng: MapRNG,
+                topology: "four"
+            });
             const walkStart = gameMap.getRandomFloor();
             gen.walkSteps({
                 start: walkStart,
@@ -187,7 +190,7 @@ export const MapFactory = {
         const gen = new Generation.DrunkardsWalk({
             width: gameMap.width,
             height: gameMap.height,
-            rng: GameManager.rng,
+            rng: MapRNG,
             topology: "four"
         });
 

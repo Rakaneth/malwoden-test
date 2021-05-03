@@ -1,11 +1,10 @@
 import { Rect } from './utils';
 import { GameManager } from './game';
-import { Player } from './components';
+import { MapRNG, pctChance } from './rng';
 
 const MIN_BSP_SIZE = 15;
 const MAX_BSP_SIZE = 21;
 const MIN_ROOM_SIZE = 5;
-const MAX_ROOM_SIZE = 19;
 const RECT_RATIO = (1 + Math.sqrt(5)) / 2; //golden ratio
 
 function moveAlongX(x1, x2, y, cb) {
@@ -32,15 +31,15 @@ function moveAlongY(y1, y2, x, cb) {
 
 function moveAlongCorridor(start, goal, cb) {
     //bendH means the bend itself is horizontal, i.e. vertical corridor
-    const bendH = GameManager.rng.nextBoolean();
+    const bendH = MapRNG.nextBoolean();
     let bendStop;
     if (bendH) {
-        bendStop = GameManager.rng.nextInt(start.y, goal.y);
+        bendStop = MapRNG.nextInt(start.y, goal.y);
         moveAlongY(start.y, bendStop, start.x, cb);
         moveAlongY(bendStop, goal.y, goal.x, cb);
         moveAlongX(start.x, goal.x, bendStop, cb);
     } else {
-        bendStop = GameManager.rng.nextInt(start.x, goal.x);
+        bendStop = MapRNG.nextInt(start.x, goal.x);
         moveAlongX(start.x, bendStop, start.y, cb);
         moveAlongX(bendStop, goal.x, goal.y, cb);
         moveAlongY(start.y, goal.y, bendStop, cb);
@@ -61,7 +60,7 @@ export class BSPNode extends Rect {
         if (!(this.left === null && this.right === null)) {
             return false;
         }
-        let splitH = GameManager.rng.nextBoolean();
+        let splitH = MapRNG.nextBoolean();
         const w = this.width;
         const h = this.height;
         
@@ -76,7 +75,7 @@ export class BSPNode extends Rect {
             return false;
         }
 
-        const s = GameManager.rng.nextInt(MIN_BSP_SIZE, max);
+        const s = MapRNG.nextInt(MIN_BSP_SIZE, max);
         let rect;
         if (splitH) {
             this.left = new BSPNode(this.x, this.y, this.width, s);
@@ -115,7 +114,7 @@ export class BSPNode extends Rect {
             return lRoom;
         } else if (!lRoom) {
             return rRoom;
-        } else if (GameManager.rng.nextBoolean()) {
+        } else if (MapRNG.nextBoolean()) {
             return rRoom;
         } else {
             return lRoom;
@@ -127,12 +126,12 @@ export class BSPNode extends Rect {
     get link() {
         if (!this._link) {
             if (this.room) {
-                const linkX = GameManager.rng.nextInt(this.room.x1, this.room.x2);
-                const linkY = GameManager.rng.nextInt(this.room.y1, this.room.y2);
+                const linkX = MapRNG.nextInt(this.room.x1, this.room.x2);
+                const linkY = MapRNG.nextInt(this.room.y1, this.room.y2);
                 this._link = {x: linkX, y: linkY};
             } else {
                 const cands = Object.values(this.path);
-                this._link = GameManager.rng.nextItem(cands);
+                this._link = MapRNG.nextItem(cands);
             }
         }
 
@@ -149,10 +148,10 @@ export class BSPNode extends Rect {
         }
 
         if (this.isLeaf) {
-            let roomW = GameManager.rng.nextInt(MIN_ROOM_SIZE, this.width - 2);
-            let roomH = GameManager.rng.nextInt(MIN_ROOM_SIZE, this.height - 2);
-            let roomX = GameManager.rng.nextInt(1, this.width - roomW - 1);
-            let roomY = GameManager.rng.nextInt(1, this.height - roomH - 1);
+            let roomW = MapRNG.nextInt(MIN_ROOM_SIZE, this.width - 2);
+            let roomH = MapRNG.nextInt(MIN_ROOM_SIZE, this.height - 2);
+            let roomX = MapRNG.nextInt(1, this.width - roomW - 1);
+            let roomY = MapRNG.nextInt(1, this.height - roomH - 1);
     
             this.room = new Rect(this.x + roomX, this.y + roomY, roomW, roomH);
         } else {
@@ -176,7 +175,7 @@ export function bspSplit(rootNode) {
         didSplit = false;
         for (let node of results) {
             if (node.left === null && node.right === null) {
-                if (node.shouldSplit || GameManager.pctChance(35)) {
+                if (node.shouldSplit || pctChance(35)) {
                     if (node.split()) {
                         results.push(node.left);
                         results.push(node.right);

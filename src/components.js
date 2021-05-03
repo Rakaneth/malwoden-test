@@ -1,17 +1,19 @@
 import {Mixin} from './mixin';
 import {GameManager} from './game';
 import { remove } from 'lodash'
+import { GameRNG } from './rng'
 
 //flags
 export const Player = new Mixin("player", "actor");
 export const Blocker = new Mixin("blocker", "blocker");
 export const Carryable = new Mixin("carryable", "carryable");
 export const DoorOpener = new Mixin("doorOpener", "doorOpener");
+export const Opaque = new Mixin("opaque", "opaque");
 
 //item attributes
 export const MoneyDrop = new Mixin("moneyDrop", "moneyDrop", {
     init(opts) {
-        this.amt = GameManager.rng.nextInt(opts.minCoins, opts.maxCoins);
+        this.amt = GameRNG.nextInt(opts.minCoins, opts.maxCoins);
     }
 });
 

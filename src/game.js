@@ -7,11 +7,8 @@ class Game {
         this._entities = {};
         this._maps = {};
         this._curMapId = "none";
-        this._rng = new Rand.AleaRNG();
         this._msgs = [];
     }
-
-    get rng() { return this._rng; }
 
     get curMap() {
         return this._maps[this._curMapId];
@@ -75,24 +72,6 @@ class Game {
         }
         const pred = (e) => e.isAt(point, mapID) && e.has('blocker');
         return Object.values(this._entities).find(pred);
-    }
-
-    pctChance(pct) {
-        return this.rng.nextInt(0, 99) < pct;
-    }
-
-    weightedItem(tbl, weightFn) {
-        const sum = Object.values(tbl)
-            .reduce((a, b) => weightFn(a) + weightFn(b), 0);
-        const roll = this._rng.nextInt(0, sum-1);
-        let acc = 0;
-        for (let k in tbl) {
-            let o = tbl[k];
-            acc += weightFn(o);
-            if (roll < acc) {
-                return [k, o];
-            }
-        }
     }
 
     updateFOV() {

@@ -1,5 +1,5 @@
 import { Color, Glyph} from "malwoden";
-import { GameManager } from "./game";
+import { pctChance } from './rng';
 
 export class Entity {
     constructor(id, layer, opts) {
@@ -34,7 +34,7 @@ export class Entity {
             for (let chance in opts.egos) {
                 const ego = opts.egos[chance]
                 const c = parseInt(chance, 10);
-                const check = GameManager.pctChance(c);
+                const check = pctChance(c);
                 const canPrefix = !this.has("prefix") && ego.isPrefix;
                 const canSuffix = !this.has("suffix") && ego.isSuffix;
                 if (check && (canPrefix || canSuffix)) {

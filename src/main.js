@@ -8,6 +8,7 @@ import { EntityFactory, EntityType, seed } from './factory';
 import { Entity } from './entity';
 import { clamp } from './utils';
 import { MainScreen } from './screen';
+import { nextNormal, rollDice, testDiff, testNormal, testRollDice, testUniform } from './rng';
 
 window.onload = () => {
     const mountNode = document.getElementById('canvas');
@@ -37,6 +38,10 @@ window.onload = () => {
     let curScreen = new MainScreen(terminal);
     const keyboard = new Input.KeyboardHandler();
     keyboard.setContext(curScreen.keyboardContext);
+
+    //testNormal(1, 4, 2);
+    //testNormal(1, 4, 5);
+    testDiff(10, 5);
 
     GameManager.updateFOV();
 

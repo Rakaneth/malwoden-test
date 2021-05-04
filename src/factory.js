@@ -107,7 +107,7 @@ export const EntityFactory = {
 
     randomFrom(repo) {
         const [buildID, o] = getWeightedItem(repo, e => e.freq || 0);
-        return [buildID, cloneDeep(o)];
+        return [buildID, deepClone(o)];
     },
 
     randomEquipment() {

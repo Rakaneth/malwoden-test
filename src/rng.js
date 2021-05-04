@@ -6,7 +6,7 @@ export const MapRNG = new Rand.AleaRNG();
 
 export function getWeightedItem(tbl, weightFn) {
     const sum = Object.values(tbl)
-        .reduce((a, b) => weightFn(a) + weightFn(b), 0);
+        .reduce((acc, item) => acc + weightFn(item), 0);
     const roll = GameRNG.nextInt(0, sum);
     let acc = 0;
     for (let k in tbl) {

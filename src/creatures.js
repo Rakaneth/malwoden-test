@@ -1,5 +1,6 @@
-import { DoorOpener } from './components'
+import { DoorOpener, Equipper } from './components'
 import { Ferocity, Savage } from './egos'
+import { Swatch } from './swatch';
 
 export const CREATURES = {
     wolf: {
@@ -7,7 +8,7 @@ export const CREATURES = {
         desc: "A large wolf",
         glyph: {
             char: 'w',
-            color: [192, 101, 97],
+            color: Swatch.wolfBrown,
         },
         tags: ["wolf", "animal"],
         egos: {
@@ -22,7 +23,7 @@ export const CREATURES = {
         desc: "A lurking bandit",
         glyph: {
             char: '@',
-            color: [100, 0, 100],
+            color: Swatch.roguePurple,
         },
         tags: ["human"],
         egos: {
@@ -30,14 +31,14 @@ export const CREATURES = {
             5: Ferocity,
         },
         freq: 5,
-        components: [DoorOpener],
+        components: [DoorOpener, Equipper],
     },
     cultist: {
         name: "cultist",
         desc: "A mysterious, hooded figure",
         glyph: {
             char: '@',
-            color: [191, 0, 191]
+            color: Swatch.cultistPurple,
         },
         tags: ["human", "cult"],
         egos: {

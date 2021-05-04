@@ -24,7 +24,6 @@ export class Screen {
     get keyboardContext() {
         if (!this._keyboardContext) {
             throw new Error(`Screen ${this._name} has not implemented a keyboard context`);
-            return null;
         }
         return this._keyboardContext;
     }
@@ -58,8 +57,8 @@ class ScreensManager {
     }
 
     registerMany(terminal, ...screenTypes) {
-        for (let t of screenTypes) {
-            this.register(new t(terminal));
+        for (let T of screenTypes) {
+            this.register(new T(terminal));
         }
     }
 

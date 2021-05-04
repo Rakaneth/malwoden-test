@@ -1,20 +1,34 @@
-import { Blocker, Player, Vision } from "./components";
+import { 
+    Blocker, 
+    Carryable, 
+    EquipmentStats, 
+    Player, 
+    Vision, 
+    Equipper, 
+    PrimaryStats 
+} from "./components";
+
 import { Entity } from './entity';
 import { GameManager } from './game';
 import { CREATURES } from "./creatures";
 import { cloneDeep } from 'lodash';
 import { getWeightedItem } from './rng'
+import { EQUIPMENT } from "./equipment";
 
 let idCounter = 0;
 
 export const EntityType = {
     PLAYER: {
         layer: 3,
-        components: [Player, Blocker, Vision] //TODO: Vision
+        components: [Player, Blocker, Vision, PrimaryStats, Equipper],
     },
     CREATURE: {
         layer: 2,
-        components: [Blocker, Vision] //TODO: Vision
+        components: [Blocker, Vision, PrimaryStats],
+    },
+    EQUIP: {
+        layer: 1,
+        components: [EquipmentStats, Carryable],
     },
     ITEM: {
         layer: 1,
@@ -25,7 +39,7 @@ function _makeID(name) {
     return `${name}-${idCounter++}`;
 }
 
-export function seed(gameMap, entity) {
+export function seed(entity, gameMap=GameManager.curMap) {
     const pos = gameMap.getRandomFloor();
     entity.moveTo(pos.x, pos.y, gameMap.id);
     GameManager.addEntity(entity);
@@ -33,7 +47,7 @@ export function seed(gameMap, entity) {
 
 export const EntityFactory = {
     makeCreature(buildID, eType, id=null) {
-        const template = cloneDeep(CREATURES[buildID]);
+        const template = CREATURES[buildID];
         const creatureID = id || _makeID(buildID)
         const e = new Entity(creatureID, eType.layer, template);
         if (eType.components) {
@@ -44,20 +58,52 @@ export const EntityFactory = {
         return e;
     },
 
+    makeEquip(buildID, eType) {
+        const template = EQUIPMENT[buildID];
+        const id = _makeID(buildID);
+        const e = new Entity(id, eType.layer, template);
+        if (eType.components) {
+            for (let c of eType.components) {
+                e.applyComponents(c, template);
+            }
+        }
+    },
+
     makePlayer(buildID, playerName, playerDesc) {
-        const template = cloneDeep(CREATURES[buildID]);
+        const template = CREATURES[buildID];
         template.name = playerName;
         template.desc = playerDesc;
         return this.makeCreature(buildID, EntityType.PLAYER, "player");
     },
 
-    randomCreature() {
-        const buildID = cloneDeep(this._randomTemplateFrom(CREATURES));
-        return this.makeCreature(buildID, EntityType.CREATURE);
+    thingFromTemplate(eID, template, eType) {
+        const e = new Entity(eID, eType.layer, template);
+        const components = eType.components || [];
+        for (let c of components) {
+            e.applyComponent(c, template);
+        }
+        return e;
     },
 
-    _randomTemplateFrom(repo) {
-        const [buildID, _] = getWeightedItem(repo, (t) => t.freq || 0);
-        return buildID;
-    }
+    randomFrom(repo) {
+        const [buildID, o] = getWeightedItem(repo, e => e.freq || 0);
+        return [buildID, cloneDeep(o)];
+    },
+
+    randomEquipment() {
+        const [buildID, o] = this.randomFrom(EQUIPMENT);
+        return this.thingFromTemplate(_makeID(buildID), o, EntityType.EQUIP);
+    },
+
+    randomCreature() {
+        const [buildID, o] = this.randomFrom(CREATURES);
+        return this.thingFromTemplate(_makeID(buildID), o, EntityType.CREATURE);
+    },
+
+    /*
+    randomItem() {
+        const [buildID, o] = this.randomFrom(ITEMS);
+        return this.thingFromTemplate(buildID, o, EntityType.ITEM);
+    },
+    */
 }

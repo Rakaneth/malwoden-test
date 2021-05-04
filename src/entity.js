@@ -8,14 +8,21 @@ export class Entity {
         this._id = id;
         this._name = opts.name || "No name";
         this._desc = opts.desc || "No desc";
+        let glyph;
+        
         if (opts.glyph) {
             const [r, g, b] = opts.glyph.color;
             const color = new Color(r, g, b);
-            const glyph = new Glyph(opts.glyph.char, color);
+            if (typeof(opts.glyph.char) === 'string') {
+                glyph = new Glyph(opts.glyph.char, color);
+            } else {
+                glyph = Glyph.fromCharCode(opts.glyph.char, color);
+            }
             this._glyph = glyph;
         } else {
             this._glyph = Glyph.fromCharCode(CharCode.at);
         }
+
         this._layer = layer;
         this._components = {};
         this._groups = {};
@@ -53,6 +60,7 @@ export class Entity {
     get id() { return this._id; }
 
     applyComponent(component, opts) {
+        if (this.has(component.name)) return;
         for (let k in component) {
             const excludeProps = [
                 'init', 
@@ -60,7 +68,7 @@ export class Entity {
                 'name', 
                 'stats', 
                 'isPrefix', 
-                'isSuffix'
+                'isSuffix',
             ];
             if (!(excludeProps.includes(k) || this.hasOwnProperty(k))) {
                 const propDesc = Object.getOwnPropertyDescriptor(component, k);

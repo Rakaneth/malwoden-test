@@ -28,12 +28,17 @@ window.onload = () => {
     GameManager.addMap(testMap);
     GameManager.addMap(bspTest);
     GameManager.curMap = "test-map";
-    const e1 = EntityFactory.randomCreature();
-    const e2 = EntityFactory.randomCreature();
-    const player = EntityFactory.makePlayer('rogue');
-    seed(GameManager.curMap, e1);
-    seed(GameManager.curMap, e2);
-    seed(GameManager.curMap, player);
+    const player = EntityFactory.makePlayer('rogue', "Farin");
+    seed(player);
+    for (let n=0; n<10; n++) {
+        const npc = EntityFactory.randomCreature();
+        seed(npc);
+    }
+
+    for (let e=0; e<10; e++) {
+        const eq = EntityFactory.randomEquipment();
+        seed(eq);
+    }
 
     //ScreenManager.register(new MainScreen(terminal));
     ScreenManager.registerMany(terminal, MainScreen, MessageScreen);
@@ -41,7 +46,7 @@ window.onload = () => {
 
     //testNormal(1, 4, 2);
     //testNormal(1, 4, 5);
-    testDiff(10, 5, 7);
+    testDiff(10, 5, 15);
 
     GameManager.updateFOV();
 

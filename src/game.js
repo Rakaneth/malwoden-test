@@ -77,6 +77,10 @@ class Game {
         this.curMap.updateFOV(this.player);
     }
 
+    playerCanSee(pointOrEntity) {
+        return this.player.canSee(pointOrEntity);
+    }
+
     
 }
 

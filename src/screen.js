@@ -1,4 +1,4 @@
-import { Color, Glyph, GUI, Input } from 'malwoden';
+import { Color, Glyph, GUI, Input, Terminal } from 'malwoden';
 import { GameManager } from './game';
 import { clamp, wrap } from './utils';
 
@@ -211,6 +211,7 @@ export class MainScreen extends Screen {
         const p = GameManager.player.pos;
         const mName = GameManager.curMap.name;
         this._terminal.writeAt({x: 0, y: 30}, `${mName} (${p.x},${p.y})`);
+        this._fillBar({x: 0, y: 31}, "HP", 10, 0.75, Color.Crimson);
     }
 
     _renderLastMsg() {
@@ -252,6 +253,16 @@ export class MainScreen extends Screen {
                 this._toolTip = null;
             }
             this.render();
+        }
+    }
+
+    _fillBar(p, label, width, pct, fillColor) {
+        const fillBars = Math.floor(width * pct);
+        const l = label.length;
+        this._terminal.writeAt(p, label);
+        for (let i=0; i<width; i++) {
+            let c = (i <= fillBars) ? fillColor : fillColor.blend(Color.Black);
+            this._terminal.drawCharCode({x: p.x+l+1+i, y: p.y}, Terminal.CharCode.fullBlock, c);
         }
     }
 

@@ -41,34 +41,6 @@ export function rollDice(diceString) {
     return total;
 }
 
-/*
-let spare = 0.0;
-let hasSpare = false;
-
-export function nextNormal(mean, variance) {
-    const stdDev = Math.sqrt(variance);
-
-    if (hasSpare) {
-        hasSpare = false;
-        return spare * stdDev + mean;
-    } else {
-        let u = 0.0;
-        let v = 0.0;
-        let s = 0.0;
-
-        do {
-            u = GameRNG.next() * 2 - 1;
-            v = GameRNG.next() * 2 - 1;
-            s = u*u + v*v;
-        } while (s >= 1 || s == 0);
-        s = Math.sqrt(-2.0 * Math.log(s) / s);
-        spare = v * s;
-        hasSpare = true;
-        return mean + stdDev * u * s;
-    }
-}
-*/
-
 export function nextNormal(min, max, rolls=3) {
     let v = (rolls < 2) ? 2 : rolls;
     let acc = 0;

@@ -35,7 +35,7 @@ export const Inventory = new Mixin('inventory', 'inventory', {
     init(opts) {
         this._inventory = [];
         this._invCapacity = opts.invCapacity || 2;
-        this._money = 0;
+        this._money = opts.money || 0;
     },
 
     addInventory(eID) {
@@ -54,6 +54,7 @@ export const Inventory = new Mixin('inventory', 'inventory', {
         if (!this._inventory) return [];
         return this._inventory.map(eID => GameManager.getEntity(eID)) 
     },
+    get money() { return this._money; },
 
     pickUp(itemOrEID) {
         const thing = typeof(itemOrEID) === 'string' ? GameManager.getEntity(itemOrEID) : itemOrEID;
@@ -200,3 +201,4 @@ export const Equipper = new Mixin('equipper', 'stats', {
     get equippedTrinket() { return this.getEquipSlot(EquipSlots.TRINKET); },
     get equippedTorch() { return this.getEquipSlot(EquipSlots.TORCH); }
 });
+

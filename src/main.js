@@ -9,12 +9,13 @@ import { ScreenManager } from './screens/screen';
 import MainScreen from './screens/mainscreen';
 import MessageScreen from './screens/msgscreen';
 import { nextNormal, rollDice, testDiff, testNormal, testRollDice, testUniform } from './rng';
+import { Elf, Wolfborn, Dwarf } from './egos';
 
 window.onload = () => {
     const mountNode = document.getElementById('canvas');
 
     const displayOptions = {
-        width: 50,
+        width: 60,
         height: 35,
         imageURL: img,
         mountNode,
@@ -28,7 +29,7 @@ window.onload = () => {
     GameManager.addMap(testMap);
     GameManager.addMap(bspTest);
     GameManager.curMap = "test-map";
-    const player = EntityFactory.makePlayer('rogue', "Farin");
+    const player = EntityFactory.makePlayer('rogue', "Farin", Dwarf);
     seed(player);
     for (let n=0; n<10; n++) {
         const npc = EntityFactory.randomCreature();

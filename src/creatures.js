@@ -1,4 +1,4 @@
-import { DoorOpener, Equipper } from './components'
+import { DoorOpener, Equipper, Inventory } from './components'
 import { Ferocity, Savage } from './egos'
 import { Swatch } from './swatch';
 
@@ -31,7 +31,7 @@ export const CREATURES = {
             5: Ferocity,
         },
         freq: 5,
-        components: [DoorOpener, Equipper],
+        components: [DoorOpener, Equipper, Inventory],
     },
     cultist: {
         name: "cultist",

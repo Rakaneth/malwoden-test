@@ -89,10 +89,19 @@ export const EntityFactory = {
         }
     },
 
-    makePlayer(buildID, playerName, playerDesc) {
+    makePlayer(buildID, playerName, race) {
         const template = deepClone(CREATURES[buildID]);
         template.name = playerName;
-        template.desc = playerDesc;
+        template.desc = "You";
+        template.noEgos = true; //no more savage Farin!
+        template.money = 100;
+        if (race) {
+            if (template.components) {
+                template.components.push(race);
+            } else {
+                template.components = [race];
+            }
+        }
         return this.thingFromTemplate("player", template, EntityType.PLAYER);
     },
 

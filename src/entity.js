@@ -60,7 +60,15 @@ export class Entity {
     get id() { return this._id; }
 
     applyComponent(component, opts) {
+        //disable egos in template
+        if (opts.noEgos && (component.isSuffix || component.isPrefix)) return;
+        
+        //can't have the same component twice
         if (this.has(component.name)) return;
+
+        //can't have multiple races
+        if (component.isRace && this.has('race')) return;
+
         for (let k in component) {
             const excludeProps = [
                 'init', 
@@ -69,6 +77,7 @@ export class Entity {
                 'stats', 
                 'isPrefix', 
                 'isSuffix',
+                'isRace',
             ];
             if (!(excludeProps.includes(k) || this.hasOwnProperty(k))) {
                 const propDesc = Object.getOwnPropertyDescriptor(component, k);

@@ -65,3 +65,13 @@ export function wrap(s, maxLength) {
     }
     return result;
 }
+
+/**
+ * Clips `s` to a maximum length of `maxLength` characters.
+ * @param {string} s 
+ * @param {number} maxLength 
+ * @returns string The clipped string.
+ */
+export function clip(s, maxLength) {
+    return wrap(s, maxLength)[0];
+}

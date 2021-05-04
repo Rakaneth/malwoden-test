@@ -1,10 +1,13 @@
 import {ScreenManager, Screen} from './screen';
-import { Color, Glyph, Input, Terminal } from 'malwoden';
-import { clamp, wrap} from '../utils';
+import { Color, Glyph, GUI, Input, Terminal } from 'malwoden';
+import { clamp, wrap, clip} from '../utils';
 import { GameManager } from '../game';
+import { capitalize } from 'lodash';
 
-const MAP_W = 50;
+const MAP_W = 60;
 const MAP_H = 30;
+const STAT_W = 60;
+const STAT_H = 5;
 
 function calc(p, m, s) {
     return clamp(p - Math.floor(s/2), 0, Math.max(0, m-s));
@@ -24,7 +27,7 @@ export default class MainScreen extends Screen {
             .onDown(Input.KeyCode.A, this.renderCB(boundMoveBy, -1, 0))
             .onDown(Input.KeyCode.S, this.renderCB(boundMoveBy, 0, 1))
             .onDown(Input.KeyCode.D, this.renderCB(boundMoveBy, 1, 0))
-            .onDown(Input.KeyCode.H, openMsgCB);
+            .onDown(Input.KeyCode.M, openMsgCB);
         this._mouseContext = new Input.MouseContext()
             .onMouseDown(boundOnClick);
     }
@@ -113,10 +116,28 @@ export default class MainScreen extends Screen {
 
     _renderStats() {
         //TODO: render stats
-        const p = GameManager.player.pos;
-        const mName = GameManager.curMap.name;
-        this._terminal.writeAt({x: 0, y: 30}, `${mName} (${p.x},${p.y})`);
-        this._fillBar({x: 0, y: 31}, "HP", 10, 0.75, Color.Crimson);
+        GUI.box(this._terminal, {
+            origin: {x: 0, y: 30},
+            width: STAT_W - 1,
+            height: STAT_H -1,
+        })
+        const player = GameManager.player;
+        const p = player.pos;
+        const race = capitalize(player.raceName) || "Human"
+        const mName = clip(GameManager.curMap.name, 19);
+        const pName = clip(`${player.name} the ${race}`, 19);
+        const pMoney = player.money;
+        this._terminal.writeAt({x: 1, y: 31}, pName);
+        this._terminal.writeAt({x: 1, y: 32}, `${mName} (${p.x},${p.y})`);
+        this._terminal.writeAt({x: 1, y: 33}, `Silver: ${pMoney}`)
+        this._terminal.writeAt({x: 20, y: 31}, `Atp ${player.atp}`);
+        this._terminal.writeAt({x: 20, y: 32}, `Dfp ${player.dfp}`);
+        this._terminal.writeAt({x: 20, y: 33}, `Tou ${player.tou}`);
+        this._terminal.writeAt({x: 27, y: 31}, `Wil ${player.wil}`);
+        this._terminal.writeAt({x: 27, y: 32}, `Pwr ${player.pwr}`);
+        this._terminal.writeAt({x: 27, y: 33}, `Dmg ${player.dmg}`);
+        this._terminal.writeAt({x: 40, y: 31}, "Placeholder");
+        
     }
 
     _renderLastMsg() {

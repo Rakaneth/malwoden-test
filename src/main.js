@@ -4,10 +4,10 @@ import { Glyph, Input, Terminal } from 'malwoden';
 import { GameManager } from './game';
 import img from './agm_16x16.png';
 import { MapFactory } from './gamemap';
-import { EntityFactory, EntityType, seed } from './factory';
-import { Entity } from './entity';
-import { clamp } from './utils';
-import { MainScreen, MessageScreen, ScreenManager } from './screen';
+import { EntityFactory, seed } from './factory';
+import { ScreenManager } from './screens/screen';
+import MainScreen from './screens/mainscreen';
+import MessageScreen from './screens/msgscreen';
 import { nextNormal, rollDice, testDiff, testNormal, testRollDice, testUniform } from './rng';
 
 window.onload = () => {

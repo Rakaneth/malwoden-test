@@ -45,9 +45,29 @@ export function seed(entity, gameMap=GameManager.curMap) {
     GameManager.addEntity(entity);
 }
 
+//we need this because lodash doesn't know how to clone getters,
+//which our components make extensive use of
+//we need to clone things so that the base templates don't get 
+//changed while creating entities.
+
+function deepClone(obj) {
+    let base = cloneDeep(obj);
+    for (let k in obj) {
+        if (typeof(obj[k]) === 'object') {
+            base[k] = deepClone(obj[k]);
+        }
+        const prop = Object.getOwnPropertyDescriptor(obj, k);
+        if (prop.get || prop.set) {
+            Object.defineProperty(base, k, prop);
+        }
+    }
+    
+    return base;
+}
+
 export const EntityFactory = {
     makeCreature(buildID, eType, id=null) {
-        const template = CREATURES[buildID];
+        const template = deepClone(CREATURES[buildID]);
         const creatureID = id || _makeID(buildID)
         const e = new Entity(creatureID, eType.layer, template);
         if (eType.components) {
@@ -59,7 +79,7 @@ export const EntityFactory = {
     },
 
     makeEquip(buildID, eType) {
-        const template = EQUIPMENT[buildID];
+        const template = deepClone(EQUIPMENT[buildID]);
         const id = _makeID(buildID);
         const e = new Entity(id, eType.layer, template);
         if (eType.components) {
@@ -70,10 +90,10 @@ export const EntityFactory = {
     },
 
     makePlayer(buildID, playerName, playerDesc) {
-        const template = CREATURES[buildID];
+        const template = deepClone(CREATURES[buildID]);
         template.name = playerName;
         template.desc = playerDesc;
-        return this.makeCreature(buildID, EntityType.PLAYER, "player");
+        return this.thingFromTemplate("player", template, EntityType.PLAYER);
     },
 
     thingFromTemplate(eID, template, eType) {

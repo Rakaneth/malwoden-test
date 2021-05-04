@@ -7,6 +7,7 @@ export class Screen {
         this._name = name;
         this._terminal = rootTeminal;
         this._keyboardContext = null;
+        this._mouseContext = null;
     }
 
     get name() { return this._name; }
@@ -21,6 +22,23 @@ export class Screen {
         throw new Error(`Screen ${this._name} has not implemented a render function`);
     }
 
+    _onMouseMove(p) {}
+
+    _inTerminal(sp) {
+        const w = this._terminal.width;
+        const h = this._terminal.height;
+        return sp.x >= 0 && sp.x < w && sp.y >= 0 && sp.y < h
+    }
+
+    mouseMove(p) {
+        const pt = this._terminal.pixelToChar(p);
+        const w = this._terminal.width;
+        const h = this._terminal.height;
+        if (pt.x >= 0 && pt.x < w && pt.y >= 0 && pt.y < h) {
+            this._onMouseMove(pt);
+        }
+    }
+
     get keyboardContext() {
         if (!this._keyboardContext) {
             throw new Error(`Screen ${this._name} has not implemented a keyboard context`);
@@ -28,12 +46,15 @@ export class Screen {
         return this._keyboardContext;
     }
 
+    get mouseContext() {
+        return this._mouseContext;
+    }
+
     renderCB(fn, ...args) {
-        const that = this;
         return function() {
             fn(...args);
             GameManager.updateFOV();
-            that.render();
+            ScreenManager.render();
         }
     }
 }
@@ -50,6 +71,7 @@ class ScreensManager {
         this._screens = {}
         this._curScreenID = "none";
         this._keyboard = new Input.KeyboardHandler();
+        this._mouse = new Input.MouseHandler();
     }
 
     register(screen) {
@@ -67,10 +89,16 @@ class ScreensManager {
         this._curScreenID = screenName; 
         this._keyboard.clearContext();
         this._keyboard.setContext(this.curScreen.keyboardContext);
+        this._mouse.clearContext();
+        if (this.curScreen.mouseContext) {
+            this._mouse.setContext(this.curScreen.mouseContext);
+        }
         this.render();
     }
 
     render() {
+        const pos = this._mouse.getPos();
+        this.curScreen.mouseMove(pos);
         this.curScreen.render();
     }
 }
@@ -84,13 +112,16 @@ export class MainScreen extends Screen {
         this._mapvp = rootTerminal.port({x: 0, y: 0}, MAP_W, MAP_H);
         const boundMoveBy = GameManager.player.moveBy.bind(GameManager.player);
         const openMsgCB = () => {ScreenManager.curScreen = "message"; }
-        this._displayMsgs = false;
+        this._toolTip = null;
+        const boundOnClick = this._onClick.bind(this);
         this._keyboardContext = new Input.KeyboardContext()
             .onDown(Input.KeyCode.W, this.renderCB(boundMoveBy, 0, -1))
             .onDown(Input.KeyCode.A, this.renderCB(boundMoveBy, -1, 0))
             .onDown(Input.KeyCode.S, this.renderCB(boundMoveBy, 0, 1))
             .onDown(Input.KeyCode.D, this.renderCB(boundMoveBy, 1, 0))
             .onDown(Input.KeyCode.H, openMsgCB);
+        this._mouseContext = new Input.MouseContext()
+            .onMouseDown(boundOnClick);
     }
 
     get center() { return GameManager.player.pos; }
@@ -193,12 +224,47 @@ export class MainScreen extends Screen {
         }
     }
 
+    _renderTooltip(msg, sp) { 
+        const l = msg.length;
+        const tw = this._terminal.width;
+        const txr = sp.x + 1;
+        const txl = sp.x - l - 1;
+        let tp;
+        if (txr + l < tw) {
+            tp = {x: txr, y: sp.y};
+        } else if (txl >= 1) {
+            tp = {x: sp.x - l, y: sp.y};
+        }
+        if (tp) this._terminal.writeAt(tp, msg, Color.White, Color.DarkGray); 
+    }
+
+    _onClick(p) {
+        const sp = this._terminal.pixelToChar(p);
+        if (this._inTerminal(sp)) {
+            const mp = this._screenToMap(GameManager.curMap, sp);
+            const maybeEntities = GameManager.getEntitiesAt(mp);
+            if (maybeEntities.length > 0 && GameManager.playerCanSee(mp)) {
+                this._toolTip = {
+                    names: maybeEntities.map(e => e.name).join(),
+                    sp,
+                }
+            } else {
+                this._toolTip = null;
+            }
+            this.render();
+        }
+    }
+
     _onRender() {
         this._renderMap();
         this._renderEntities();
+        if (this._toolTip) {
+            const {names, sp} = this._toolTip;
+            this._renderTooltip(names, sp);
+            this._toolTip = null;
+        }
         this._renderStats();
         this._renderLastMsg();
-        
     }
 }
 

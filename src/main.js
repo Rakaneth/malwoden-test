@@ -8,6 +8,7 @@ import { EntityFactory, seed } from './factory';
 import { ScreenManager } from './screens/screen';
 import MainScreen from './screens/mainscreen';
 import MessageScreen from './screens/msgscreen';
+import CharScreen from './screens/charscreen';
 import { nextNormal, rollDice, testDiff, testNormal, testRollDice, testUniform } from './rng';
 import { Elf, Wolfborn, Dwarf } from './races';
 
@@ -42,7 +43,11 @@ window.onload = () => {
     }
 
     //ScreenManager.register(new MainScreen(terminal));
-    ScreenManager.registerMany(terminal, MainScreen, MessageScreen);
+    ScreenManager.registerMany(
+        terminal, 
+        MainScreen, 
+        MessageScreen,
+        CharScreen);
     ScreenManager.curScreen = "main";
 
     //testNormal(1, 4, 2);

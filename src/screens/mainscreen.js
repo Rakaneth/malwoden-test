@@ -1,4 +1,4 @@
-import {ScreenManager, Screen} from './screen';
+import {ScreenManager, Screen, makeStatString } from './screen';
 import { Color, Glyph, GUI, Input, Terminal } from 'malwoden';
 import { clamp, wrap, clip} from '../utils';
 import { GameManager } from '../game';
@@ -13,8 +13,10 @@ function calc(p, m, s) {
     return clamp(p - Math.floor(s/2), 0, Math.max(0, m-s));
 }
 
-function makeStatString(label, statValue) {
-    return `${label} ${statValue.toString().padStart(2)}`;
+
+
+function openCharCB() {
+    ScreenManager.curScreen = "character";
 }
 
 export default class MainScreen extends Screen {
@@ -31,7 +33,8 @@ export default class MainScreen extends Screen {
             .onDown(Input.KeyCode.A, this.renderCB(boundMoveBy, -1, 0))
             .onDown(Input.KeyCode.S, this.renderCB(boundMoveBy, 0, 1))
             .onDown(Input.KeyCode.D, this.renderCB(boundMoveBy, 1, 0))
-            .onDown(Input.KeyCode.M, openMsgCB);
+            .onDown(Input.KeyCode.M, openMsgCB)
+            .onDown(Input.KeyCode.C, openCharCB);
         this._mouseContext = new Input.MouseContext()
             .onMouseDown(boundOnClick);
         this._target = null;
@@ -145,13 +148,8 @@ export default class MainScreen extends Screen {
         const pwr = makeStatString('Pwr', player.pwr);
         this._terminal.writeAt({x: 1, y: 31}, pName);
         this._terminal.writeAt({x: 1, y: 32}, `${mName} (${p.x},${p.y})`);
-        this._terminal.writeAt({x: 1, y: 33}, `Silver: ${pMoney}`)
-        this._terminal.writeAt({x: 20, y: 31}, atp);
-        this._terminal.writeAt({x: 20, y: 32}, dfp);
-        this._terminal.writeAt({x: 20, y: 33}, tou);
-        this._terminal.writeAt({x: 27, y: 31}, wil);
-        this._terminal.writeAt({x: 27, y: 32}, pwr);
-        this._terminal.writeAt({x: 27, y: 33}, `Dmg ${player.dmg}`);
+        this._printStat(1, 33, "Silver:", pMoney);
+        this.printSecStatBlock(20, 31, player);
         this._fillBar({x: 40, y: 31}, "HP", 16, player.hpPct, Color.Crimson);
         this._fillBar({x: 40, y: 32}, "SP", 16, 0.75, Color.Blue);
     }

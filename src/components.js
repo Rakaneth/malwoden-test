@@ -5,7 +5,6 @@ import { GameRNG } from './rng'
 import { EquipSlots } from './equipslots';
 
 //flags
-export const Player = new Mixin("player", "actor");
 export const Blocker = new Mixin("blocker", "blocker");
 export const Carryable = new Mixin("carryable", "carryable");
 export const DoorOpener = new Mixin("doorOpener", "doorOpener");
@@ -256,4 +255,21 @@ export const SecondaryStats = new Mixin("combatStats", "combatStats", {
             return this._vision;
         }
     }
-})
+});
+
+export const Actor = new Mixin('actor', 'actor', {
+    init(opts) {
+        this._ai = opts.ai || "hunt";
+    },
+    getNextAction() {
+        //TODO: AI
+    }
+});
+
+export const Player = new Mixin("player", "actor", {
+    init(opts) {
+        this._action = null;
+    },
+    getNextAction() { return this._action; },
+    clearAction() { this._action = null; }
+});

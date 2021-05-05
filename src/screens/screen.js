@@ -86,7 +86,7 @@ export class Screen {
         });
     }
 
-    _printStat(x, y, label, stat) {
+    printStat(x, y, label, stat) {
         const padStat = stat.toString().padStart(2);
         this.print(x, y, label);
         this.print(x+label.length+1, y, padStat, Swatch.statGreen);
@@ -99,28 +99,27 @@ export class Screen {
     }
 
     printPriStatBlock(x, y, entity) {
-        this._printStat(x, y, 'Str', entity.str);
-        this._printStat(x, y+1, 'Stm', entity.stam);
-        this._printStat(x, y+2, 'Spd', entity.spd);
-        this._printStat(x+7, y, 'Skl', entity.skl);
-        this._printStat(x+7, y+1,'Sag', entity.sag);
-        this._printStat(x+7, y+2, 'Smt', entity.smt);
+        this.printStat(x, y, 'Str', entity.str);
+        this.printStat(x, y+1, 'Stm', entity.stam);
+        this.printStat(x, y+2, 'Spd', entity.spd);
+        this.printStat(x+7, y, 'Skl', entity.skl);
+        this.printStat(x+7, y+1,'Sag', entity.sag);
+        this.printStat(x+7, y+2, 'Smt', entity.smt);
     }
 
     printSecStatBlock(x, y, entity) {
-        this._printStat(x, y, 'Atp', entity.atp);
-        this._printStat(x, y+1, 'Dfp', entity.dfp);
-        this._printStat(x, y+2, 'Tou', entity.tou);
-        this._printStat(x+7, y, 'Wil', entity.wil);
-        this._printStat(x+7, y+1, 'Pwr', entity.pwr);
-        this._printStat(x+7, y+2, 'Dmg', entity.dmg);
+        this.printStat(x, y, 'Atp', entity.atp);
+        this.printStat(x, y+1, 'Dfp', entity.dfp);
+        this.printStat(x, y+2, 'Tou', entity.tou);
+        this.printStat(x+7, y, 'Wil', entity.wil);
+        this.printStat(x+7, y+1, 'Pwr', entity.pwr);
+        this.printStat(x+7, y+2, 'Dmg', entity.dmg);
     }
 
     printEquipBlock(x, y, entity) {
         const wpn = entity.equippedWeapon;
         const arm = entity.equippedArmor;
         const trink = entity.equippedTrinket;
-
         this._printEq(x, y, "Weapon:", wpn);
         this._printEq(x, y+1, "Armor:", arm);
         this._printEq(x, y+2, "Trinket:", trink);
@@ -166,3 +165,6 @@ class ScreensManager {
 }
 
 export const ScreenManager = new ScreensManager();
+export function escCB() {
+    ScreenManager.curScreen = "main";
+}

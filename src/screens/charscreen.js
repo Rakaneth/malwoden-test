@@ -1,10 +1,6 @@
 import { Input } from 'malwoden';
 import { GameManager } from '../game';
-import { Screen, ScreenManager, makeStatString} from './screen';
-
-function escCB() {
-    ScreenManager.curScreen = "main";
-}
+import { Screen, escCB} from './screen';
 
 export default class CharScreen extends Screen {
     constructor(terminal) {

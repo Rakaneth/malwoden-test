@@ -13,10 +13,16 @@ function calc(p, m, s) {
     return clamp(p - Math.floor(s/2), 0, Math.max(0, m-s));
 }
 
-
-
 function openCharCB() {
     ScreenManager.curScreen = "character";
+}
+
+function openMsgCB() {
+    ScreenManager.curScreen = "message"; 
+}
+
+function openHelpCB() {
+    ScreenManager.curScreen = "help";
 }
 
 export default class MainScreen extends Screen {
@@ -24,8 +30,7 @@ export default class MainScreen extends Screen {
     constructor(rootTerminal) {
         super("main", rootTerminal);
         this._mapvp = rootTerminal.port({x: 0, y: 0}, MAP_W, MAP_H);
-        const boundMoveBy = GameManager.player.moveBy.bind(GameManager.player);
-        const openMsgCB = () => {ScreenManager.curScreen = "message"; }
+        const boundMoveBy = GameManager.player.moveBy.bind(GameManager.player);   
         this._toolTip = null;
         const boundOnClick = this._onClick.bind(this);
         this._keyboardContext = new Input.KeyboardContext()
@@ -34,7 +39,8 @@ export default class MainScreen extends Screen {
             .onDown(Input.KeyCode.S, this.renderCB(boundMoveBy, 0, 1))
             .onDown(Input.KeyCode.D, this.renderCB(boundMoveBy, 1, 0))
             .onDown(Input.KeyCode.M, openMsgCB)
-            .onDown(Input.KeyCode.C, openCharCB);
+            .onDown(Input.KeyCode.C, openCharCB)
+            .onDown(Input.KeyCode.H, openHelpCB);
         this._mouseContext = new Input.MouseContext()
             .onMouseDown(boundOnClick);
         this._target = null;
@@ -129,29 +135,20 @@ export default class MainScreen extends Screen {
 
     _renderStats() {
         //TODO: render stats
-        GUI.box(this._terminal, {
-            origin: {x: 0, y: 30},
-            width: STAT_W - 1,
-            height: STAT_H -1,
-        })
-
+        this.box(0, 30, null, STAT_W-1, STAT_H-1);
         const player = GameManager.player;
         const p = player.pos;
         const race = capitalize(player.raceName) || "Human"
         const mName = clip(GameManager.curMap.name, 19);
         const pName = clip(`${player.name} the ${race}`, 19);
         const pMoney = player.money;
-        const atp = makeStatString('Atp', player.atp);
-        const dfp = makeStatString('Dfp', player.dfp);
-        const tou = makeStatString('Tou', player.tou);
-        const wil = makeStatString('Wil', player.wil);
-        const pwr = makeStatString('Pwr', player.pwr);
         this._terminal.writeAt({x: 1, y: 31}, pName);
         this._terminal.writeAt({x: 1, y: 32}, `${mName} (${p.x},${p.y})`);
-        this._printStat(1, 33, "Silver:", pMoney);
+        this.printStat(1, 33, "Silver:", pMoney);
         this.printSecStatBlock(20, 31, player);
         this._fillBar({x: 40, y: 31}, "HP", 16, player.hpPct, Color.Crimson);
-        this._fillBar({x: 40, y: 32}, "SP", 16, 0.75, Color.Blue);
+        this._fillBar({x: 40, y: 32}, "SP", 16, 0.75, Color.Yellow);
+        this.print(40, 33, "Press 'h' for help.");
     }
 
     _renderLastMsg() {

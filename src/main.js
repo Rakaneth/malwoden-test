@@ -11,6 +11,7 @@ import MessageScreen from './screens/msgscreen';
 import CharScreen from './screens/charscreen';
 import { nextNormal, rollDice, testDiff, testNormal, testRollDice, testUniform } from './rng';
 import { Elf, Wolfborn, Dwarf } from './races';
+import HelpScreen from './screens/helpscreen';
 
 window.onload = () => {
     const mountNode = document.getElementById('canvas');
@@ -47,7 +48,8 @@ window.onload = () => {
         terminal, 
         MainScreen, 
         MessageScreen,
-        CharScreen);
+        CharScreen,
+        HelpScreen);
     ScreenManager.curScreen = "main";
 
     //testNormal(1, 4, 2);

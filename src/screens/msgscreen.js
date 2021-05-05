@@ -1,7 +1,7 @@
 import { clamp, wrap } from '../utils';
 import { GUI, Input } from 'malwoden';
 import { GameManager } from '../game';
-import { Screen, ScreenManager } from './screen';
+import { Screen, escCB } from './screen';
 
 export default class MessageScreen extends Screen {
     constructor(terminal) {
@@ -13,7 +13,6 @@ export default class MessageScreen extends Screen {
         const downCB = () => {
             this._downIdx = clamp(this._downIdx + 1, 0, GameManager.msgs.length-1);
         };
-        const escCB = () => { ScreenManager.curScreen = "main"; }
         this._keyboardContext = new Input.KeyboardContext()
             .onDown(Input.KeyCode.W, this.renderCB(upCB))
             .onDown(Input.KeyCode.S, this.renderCB(downCB))

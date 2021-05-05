@@ -136,6 +136,10 @@ export const EquipmentStats = new Mixin('equipStats', 'equipStats', {
 })
 
 export const Equipper = new Mixin('equipper', 'combatStats', {
+    init(opts) {
+        this._dmg = opts.dmg || "1d2";
+    },
+    
     get allEquipped() {
         if (!this.inventoryItems) return [];
         return this.inventoryItems.filter(item => item.equipped);
@@ -159,21 +163,30 @@ export const Equipper = new Mixin('equipper', 'combatStats', {
     get wil() { return this._sag + this.sumOfEquipped('wil'); },
     get pwr() { return this._smt + this.sumOfEquipped('pwr'); },
     get dmg() { 
-        const bonus = this._str + this.sumOfEquipped('dmgBonus');
+        let bonus = this._str + this.sumOfEquipped('dmgBonus');
         let bonusStr = "";
+        let base = "";
+        let wpnDmg;
+        if (this.equippedWeapon) {
+            wpnDmg = this.equippedWeapon.dmg; 
+        } else {
+            //TODO basic attacks for monsters
+            wpnDmg = this._dmg;
+        }
+        const dmgBonusEx = /(?<base>\d*d\d+)(?<bonus>(?:\+|\-)\d+)?/ig;
+        const diceMatch = dmgBonusEx.exec(wpnDmg);
+        if (diceMatch) {
+            base = diceMatch.groups.base;
+            if (diceMatch.groups.bonus) {
+                bonus += parseInt(diceMatch.groups.bonus);
+            }
+        }
         if (bonus > 0) {
             bonusStr = `+${bonus}`;
         } else if (bonus < 0) {
             bonusStr = `${bonus}`
         };
-        let wpnDmg;
-        if (this.equippedWeapon) {
-            wpnDmg = this.equippedWeapon.dng; 
-        } else {
-            //TODO basic attacks for monsters
-            wpnDmg = "1d2";
-        }
-        return `${wpnDmg}${bonusStr}`;
+        return `${base}${bonusStr}`;
     },
 
     get vision() { 
@@ -228,8 +241,8 @@ export const SecondaryStats = new Mixin("combatStats", "combatStats", {
     get wil() { return this._wil + this._wil; },
     get pwr() { return this._smt + this._pwr; },
     get dmg() { 
-        const bonus = this._str;
-        const dmgBonusEx = /(?<base>\d+d\d+)(?<bonus>(?:\+|\-)\d+)?/ig;
+        let bonus = this._str;
+        const dmgBonusEx = /(?<base>\d*d\d+)(?<bonus>(?:\+|\-)\d+)?/ig;
         const diceMatch = dmgBonusEx.exec(this._dmg);
         let baseDice;
         if (diceMatch)  {

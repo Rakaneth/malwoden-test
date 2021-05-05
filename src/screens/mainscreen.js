@@ -13,6 +13,10 @@ function calc(p, m, s) {
     return clamp(p - Math.floor(s/2), 0, Math.max(0, m-s));
 }
 
+function makeStatString(label, statValue) {
+    return `${label} ${statValue.toString().padStart(2)}`;
+}
+
 export default class MainScreen extends Screen {
     
     constructor(rootTerminal) {
@@ -127,23 +131,29 @@ export default class MainScreen extends Screen {
             width: STAT_W - 1,
             height: STAT_H -1,
         })
+
         const player = GameManager.player;
         const p = player.pos;
         const race = capitalize(player.raceName) || "Human"
         const mName = clip(GameManager.curMap.name, 19);
         const pName = clip(`${player.name} the ${race}`, 19);
         const pMoney = player.money;
+        const atp = makeStatString('Atp', player.atp);
+        const dfp = makeStatString('Dfp', player.dfp);
+        const tou = makeStatString('Tou', player.tou);
+        const wil = makeStatString('Wil', player.wil);
+        const pwr = makeStatString('Pwr', player.pwr);
         this._terminal.writeAt({x: 1, y: 31}, pName);
         this._terminal.writeAt({x: 1, y: 32}, `${mName} (${p.x},${p.y})`);
         this._terminal.writeAt({x: 1, y: 33}, `Silver: ${pMoney}`)
-        this._terminal.writeAt({x: 20, y: 31}, `Atp ${player.atp}`);
-        this._terminal.writeAt({x: 20, y: 32}, `Dfp ${player.dfp}`);
-        this._terminal.writeAt({x: 20, y: 33}, `Tou ${player.tou}`);
-        this._terminal.writeAt({x: 27, y: 31}, `Wil ${player.wil}`);
-        this._terminal.writeAt({x: 27, y: 32}, `Pwr ${player.pwr}`);
+        this._terminal.writeAt({x: 20, y: 31}, atp);
+        this._terminal.writeAt({x: 20, y: 32}, dfp);
+        this._terminal.writeAt({x: 20, y: 33}, tou);
+        this._terminal.writeAt({x: 27, y: 31}, wil);
+        this._terminal.writeAt({x: 27, y: 32}, pwr);
         this._terminal.writeAt({x: 27, y: 33}, `Dmg ${player.dmg}`);
-        this._terminal.writeAt({x: 40, y: 31}, "Placeholder");
-        
+        this._fillBar({x: 40, y: 31}, "HP", 16, 0.65, Color.Crimson);
+        this._fillBar({x: 40, y: 32}, "SP", 16, 0.75, Color.Blue);
     }
 
     _renderLastMsg() {

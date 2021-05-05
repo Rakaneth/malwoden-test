@@ -30,6 +30,7 @@ export default class MainScreen extends Screen {
             .onDown(Input.KeyCode.M, openMsgCB);
         this._mouseContext = new Input.MouseContext()
             .onMouseDown(boundOnClick);
+        this._target = null;
     }
 
     get center() { return GameManager.player.pos; }
@@ -112,6 +113,11 @@ export default class MainScreen extends Screen {
                 }
             }
         }
+        if (this._target) {
+            const tPos = this._mapToScreen(GameManager.curMap, this._target);
+            const tGlyph = new Glyph('X', Color.Cyan);
+            this._drawAtPosition(tPos, tGlyph);
+        }
     }
 
     _renderStats() {
@@ -167,10 +173,12 @@ export default class MainScreen extends Screen {
 
     _onClick(p) {
         const sp = this._terminal.pixelToChar(p);
+        const curMap = GameManager.curMap;
         if (this._inTerminal(sp)) {
-            const mp = this._screenToMap(GameManager.curMap, sp);
+            const mp = this._screenToMap(curMap, sp);
+            const canSee = GameManager.playerCanSee(mp);
             const maybeEntities = GameManager.getEntitiesAt(mp);
-            if (maybeEntities.length > 0 && GameManager.playerCanSee(mp)) {
+            if (maybeEntities.length > 0 && canSee) {
                 this._toolTip = {
                     names: maybeEntities.map(e => e.name).join(),
                     sp,
@@ -178,6 +186,10 @@ export default class MainScreen extends Screen {
             } else {
                 this._toolTip = null;
             }
+            if (canSee) this._target = mp;
+            this.render();
+        } else {
+            this._target = null;
             this.render();
         }
     }

@@ -1,8 +1,9 @@
-import {Mixin} from './mixin';
+import Mixin from './mixin';
 import {GameManager} from './game';
 import { remove } from 'lodash'
 import { GameRNG } from './rng'
 import { EquipSlots } from './equipslots';
+import { clamp } from './utils';
 
 //flags
 export const Blocker = new Mixin("blocker", "blocker");
@@ -11,13 +12,13 @@ export const DoorOpener = new Mixin("doorOpener", "doorOpener");
 export const Opaque = new Mixin("opaque", "opaque");
 
 //item attributes
-export const MoneyDrop = new Mixin("moneyDrop", "moneyDrop", {
+export const MoneyDrop = new Mixin("moneyDrop", "moneyDrop", 1, {
     init(opts) {
         this.amt = GameRNG.nextInt(opts.minCoins, opts.maxCoins);
     }
 });
 
-export const Healing = new Mixin("healing", "consumable", {
+export const Healing = new Mixin("healing", "consumable", 1, {
     init(opts) {
         this.amt = opts.amt;
         this.uses = opts.uses || 1;
@@ -30,7 +31,7 @@ export const Healing = new Mixin("healing", "consumable", {
 });
 
 //creature attributes
-export const Inventory = new Mixin('inventory', 'inventory', {
+export const Inventory = new Mixin('inventory', 'inventory', 1, {
     init(opts) {
         this._inventory = [];
         this._invCapacity = opts.invCapacity || 2;
@@ -92,7 +93,7 @@ export const Inventory = new Mixin('inventory', 'inventory', {
     //TODO Messaging
 });
 
-export const Vision = new Mixin('vision', 'vision', {
+export const Vision = new Mixin('vision', 'vision', 1, {
     init(opts) {
         this._vision = opts.vision || 6;
         this.inView = [];
@@ -105,7 +106,7 @@ export const Vision = new Mixin('vision', 'vision', {
     }
 });
 
-export const PrimaryStats = new Mixin('primaryStats', 'primaryStats', {
+export const PrimaryStats = new Mixin('primaryStats', 'primaryStats', 1, {
     init(opts) {
         this._str = opts.str || 1;
         this._stam = opts.stam || 1;
@@ -116,7 +117,7 @@ export const PrimaryStats = new Mixin('primaryStats', 'primaryStats', {
     }
 })
 
-export const EquipmentStats = new Mixin('equipStats', 'equipStats', {
+export const EquipmentStats = new Mixin('equipStats', 'equipStats', 1, {
     init(opts) {
         this.str = opts.str || 0;
         this.skl = opts.skl || 0;
@@ -135,7 +136,7 @@ export const EquipmentStats = new Mixin('equipStats', 'equipStats', {
     }
 })
 
-export const Equipper = new Mixin('equipper', 'combatStats', {
+export const Equipper = new Mixin('equipper', 'combatStats', 2, {
     init(opts) {
         this._dmg = opts.dmg || "1d2";
     },
@@ -218,7 +219,7 @@ export const Equipper = new Mixin('equipper', 'combatStats', {
     get equippedTorch() { return this.getEquipSlot(EquipSlots.TORCH); }
 });
 
-export const SecondaryStats = new Mixin("combatStats", "combatStats", {
+export const SecondaryStats = new Mixin("combatStats", "combatStats", 2, {
     init(opts) {
         this._atp = opts.atp || 0;
         this._dfp = opts.dfp || 0;
@@ -270,7 +271,7 @@ export const SecondaryStats = new Mixin("combatStats", "combatStats", {
     }
 });
 
-export const Actor = new Mixin('actor', 'actor', {
+export const Actor = new Mixin('actor', 'actor', 1, {
     init(opts) {
         this._ai = opts.ai || "hunt";
     },
@@ -279,10 +280,33 @@ export const Actor = new Mixin('actor', 'actor', {
     }
 });
 
-export const Player = new Mixin("player", "actor", {
+export const Player = new Mixin("player", "actor", 1, {
     init(opts) {
         this._action = null;
     },
     getNextAction() { return this._action; },
     clearAction() { this._action = null; }
 });
+
+export const Vitals = new Mixin("vitals", "vitals", 4, {
+    init(opts) {
+        this._HPMult = opts.hpMult || 5;
+    },
+
+    get maxHP() {
+        const mult = this._raceHPMult || this._HPMult;
+        return this.stam * mult;
+    },
+
+    get alive() { return this._hp > 0; },
+    get hpPct() { return this._hp / this.maxHP; },
+    get HP() { return this._hp; },
+    
+    changeHP(amt) {
+        this._hp = clamp(this._hp + amt, 0, this.maxHP);
+    },
+
+    resolve(entity, opts) {
+        entity._hp = entity.maxHP;
+    }
+})

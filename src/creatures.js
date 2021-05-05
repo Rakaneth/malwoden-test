@@ -1,5 +1,6 @@
 import { DoorOpener, Equipper, Inventory, SecondaryStats } from './components'
-import { Dwarf, Elf, Ferocity, Savage } from './egos'
+import { Dwarf, Elf, Wolfborn} from './races';
+import { Savage, Ferocity, Hardy} from './egos';
 import { Swatch } from './swatch';
 
 export const CREATURES = {

@@ -152,7 +152,7 @@ export default class MainScreen extends Screen {
         this._terminal.writeAt({x: 27, y: 31}, wil);
         this._terminal.writeAt({x: 27, y: 32}, pwr);
         this._terminal.writeAt({x: 27, y: 33}, `Dmg ${player.dmg}`);
-        this._fillBar({x: 40, y: 31}, "HP", 16, 0.65, Color.Crimson);
+        this._fillBar({x: 40, y: 31}, "HP", 16, player.hpPct, Color.Crimson);
         this._fillBar({x: 40, y: 32}, "SP", 16, 0.75, Color.Blue);
     }
 

@@ -9,7 +9,7 @@ import { ScreenManager } from './screens/screen';
 import MainScreen from './screens/mainscreen';
 import MessageScreen from './screens/msgscreen';
 import { nextNormal, rollDice, testDiff, testNormal, testRollDice, testUniform } from './rng';
-import { Elf, Wolfborn, Dwarf } from './egos';
+import { Elf, Wolfborn, Dwarf } from './races';
 
 window.onload = () => {
     const mountNode = document.getElementById('canvas');

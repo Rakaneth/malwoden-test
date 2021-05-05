@@ -9,6 +9,7 @@ export class Entity {
         this._name = opts.name || "No name";
         this._desc = opts.desc || "No desc";
         let glyph;
+        const components = opts.components || [];
         
         if (opts.glyph) {
             const [r, g, b] = opts.glyph.color;
@@ -23,6 +24,8 @@ export class Entity {
             this._glyph = Glyph.fromCharCode(CharCode.at);
         }
 
+
+
         this._layer = layer;
         this._components = {};
         this._groups = {};
@@ -31,13 +34,8 @@ export class Entity {
         if (opts.tags) {
             opts.tags.forEach(t => this._tags.add(t));
         }
-        if (opts.components) {
-            for (let c of opts.components) {
-                this.applyComponent(c, opts);
-            }
-        }
 
-        if (opts.egos) {
+        if (opts.egos && !opts.noEgos) {
             for (let chance in opts.egos) {
                 const ego = opts.egos[chance]
                 const c = parseInt(chance, 10);
@@ -45,10 +43,19 @@ export class Entity {
                 const canPrefix = !this.has("prefix") && ego.isPrefix;
                 const canSuffix = !this.has("suffix") && ego.isSuffix;
                 if (check && (canPrefix || canSuffix)) {
-                    this.applyComponent(ego, opts);
+                    components.push(ego);
                 }
             }
         }
+        components.sort((fst, snd) => fst.level - snd.level);
+        for (let comp of components) {
+            this.applyComponent(comp, opts);
+        }
+
+        for (let resolver of components.filter(c => c.resolve)) {
+            resolver.resolve(this, opts);
+        }
+
     }
 
     get pos() { return {x: this._x, y: this._y}};
@@ -78,6 +85,7 @@ export class Entity {
                 'isPrefix', 
                 'isSuffix',
                 'isRace',
+                'resolve'
             ];
             if (!(excludeProps.includes(k) || this.hasOwnProperty(k))) {
                 const propDesc = Object.getOwnPropertyDescriptor(component, k);

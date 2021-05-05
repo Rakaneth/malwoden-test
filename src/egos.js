@@ -1,69 +1,42 @@
-import { Mixin } from './mixin'
+import Mixin from './mixin'
 
 const suffixEgos = "ego,suffix,creature-ego";
 const prefixEgos = "ego,prefix,creature-ego";
 
-class Race extends Mixin {
-    constructor(race, rDesc, data) {
-        let i = {
-            raceDesc: rDesc,
-            raceName: race,
-            isRace: true,
-            ...data
+class Ego extends Mixin {
+    constructor(name, isPrefix, data) {
+        const egoGroup = isPrefix ? prefixEgos : suffixEgos;
+        let i = {...data};
+        if (isPrefix) {
+            i.isPrefix = true;
+        } else {
+            i.isSuffix = true;
         }
-        super(race, "race", i);
+        super(name, egoGroup, 5, i);
     }
 }
 
-export const Savage = new Mixin("savage", prefixEgos, {
+//creature egos
+export const Savage = new Ego("savage", true, {
     stats: {
         _str: 2,
         _stam: 1,
         _smt: -1,
+        _HPMult: 0.5,
     },
-    isPrefix: true,
-})
+});
 
-export const Ferocity = new Mixin("of ferocity", suffixEgos, {
+export const Ferocity = new Ego("of ferocity", false, {
     stats: {
         _spd: 2,
         _stam: 1,
         _sag: -1,
     },
-    isSuffix: true,
 });
 
-
-//racial egos
-export const Elf = new Race("elf", "An elf of the Fang Wood", {
+export const Hardy = new Ego("hardy", true, {
     stats: {
-        _str: -1,
-        _spd: 1,
-        _stam: -1,
-        _smt: 1
-    },
+        _stam: 2,
+        _HPMult: 1
+    }
 });
-
-export const Wolfborn = new Race("wolfborn", "A wolfborn of the Fang Wood", {
-    stats: {
-        _str: 1,
-        _spd: 1,
-        _stam: 1,
-        _smt: -1,
-        _sag: -1,
-        _money: -50,
-    },
-    scent: 8,
-    //TODO: wolf form?
-});
-
-export const Dwarf = new Race("dwarf", "A Dvergr from the Mithril Gate", {
-    stats: {
-        _skl: 1,
-        _stam: 1,
-        _spd: -1,
-        _sag: -2,
-        _money: 50,
-    },
-    darkvision: 10,
-})

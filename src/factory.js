@@ -5,7 +5,8 @@ import {
     Player, 
     Vision, 
     Equipper, 
-    PrimaryStats 
+    PrimaryStats,
+    Vitals
 } from "./components";
 
 import { Entity } from './entity';
@@ -20,11 +21,11 @@ let idCounter = 0;
 export const EntityType = {
     PLAYER: {
         layer: 3,
-        components: [Player, Blocker, Vision, PrimaryStats, Equipper],
+        components: [Player, Blocker, Vision, PrimaryStats, Equipper, Vitals],
     },
     CREATURE: {
         layer: 2,
-        components: [Blocker, Vision, PrimaryStats],
+        components: [Blocker, Vision, PrimaryStats, Vitals],
     },
     EQUIP: {
         layer: 1,
@@ -66,27 +67,16 @@ function deepClone(obj) {
 }
 
 export const EntityFactory = {
-    makeCreature(buildID, eType, id=null) {
+    makeCreature(buildID, id=null) {
         const template = deepClone(CREATURES[buildID]);
         const creatureID = id || _makeID(buildID);
-        const e = new Entity(creatureID, eType.layer, template);
-        if (eType.components) {
-            for (let c of eType.components) {
-                e.applyComponent(c, template);
-            }
-        }
-        return e;
+        return this.thingFromTemplate(creatureID, template, EntityType.CREATURE);
     },
 
     makeEquip(buildID, eType) {
         const template = deepClone(EQUIPMENT[buildID]);
         const id = _makeID(buildID);
-        const e = new Entity(id, eType.layer, template);
-        if (eType.components) {
-            for (let c of eType.components) {
-                e.applyComponents(c, template);
-            }
-        }
+        return this.thingFromTemplate(id, template, EntityType.EQUIP);
     },
 
     makePlayer(buildID, playerName, race) {
@@ -95,11 +85,13 @@ export const EntityFactory = {
         template.desc = "You";
         template.noEgos = true; //no more savage Farin!
         template.money = 100;
-        const e = this.thingFromTemplate("player", template, EntityType.PLAYER);
         if (race) {
-            e.applyComponent(race, template);
+            if (!template.components) {
+                template.components = [];
+            }
+            template.components.push(race);
         }
-        return e;
+        return this.thingFromTemplate("player", template, EntityType.PLAYER);
     },
 
     thingFromTemplate(eID, template, eType) {

@@ -52,7 +52,8 @@ export const Wolfborn = new Race("wolfborn", "A wolfborn of the Fang Wood", {
         _smt: -1,
         _sag: -1,
         _money: -50,
-    }
+    },
+    scent: 8,
     //TODO: wolf form?
 });
 
@@ -60,7 +61,9 @@ export const Dwarf = new Race("dwarf", "A Dvergr from the Mithril Gate", {
     stats: {
         _skl: 1,
         _stam: 1,
+        _spd: -1,
         _sag: -2,
         _money: 50,
-    }
+    },
+    darkvision: 10,
 })

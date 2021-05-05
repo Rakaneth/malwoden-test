@@ -68,7 +68,7 @@ function deepClone(obj) {
 export const EntityFactory = {
     makeCreature(buildID, eType, id=null) {
         const template = deepClone(CREATURES[buildID]);
-        const creatureID = id || _makeID(buildID)
+        const creatureID = id || _makeID(buildID);
         const e = new Entity(creatureID, eType.layer, template);
         if (eType.components) {
             for (let c of eType.components) {
@@ -95,22 +95,21 @@ export const EntityFactory = {
         template.desc = "You";
         template.noEgos = true; //no more savage Farin!
         template.money = 100;
+        const e = this.thingFromTemplate("player", template, EntityType.PLAYER);
         if (race) {
-            if (template.components) {
-                template.components.push(race);
-            } else {
-                template.components = [race];
-            }
+            e.applyComponent(race, template);
         }
-        return this.thingFromTemplate("player", template, EntityType.PLAYER);
+        return e;
     },
 
     thingFromTemplate(eID, template, eType) {
-        const e = new Entity(eID, eType.layer, template);
         const components = eType.components || [];
-        for (let c of components) {
-            e.applyComponent(c, template);
+        if (template.components) {
+            template.components = components.concat(template.components);
+        } else {
+            template.components = components;
         }
+        const e = new Entity(eID, eType.layer, template);
         return e;
     },
 

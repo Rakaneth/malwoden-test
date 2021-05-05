@@ -1,5 +1,5 @@
-import { DoorOpener, Equipper, Inventory } from './components'
-import { Ferocity, Savage } from './egos'
+import { DoorOpener, Equipper, Inventory, SecondaryStats } from './components'
+import { Dwarf, Elf, Ferocity, Savage } from './egos'
 import { Swatch } from './swatch';
 
 export const CREATURES = {
@@ -15,8 +15,11 @@ export const CREATURES = {
             75: Savage,
             45: Ferocity,
         },
-        vision: 10,
+        vision: 6,
         freq: 10,
+        scent: 10,
+        dmg: "1d3+1",
+        components: [SecondaryStats],
     },
     rogue: {
         name: "rogue",
@@ -25,10 +28,10 @@ export const CREATURES = {
             char: '@',
             color: Swatch.roguePurple,
         },
-        tags: ["human"],
+        tags: ["humanoid"],
         egos: {
-            10: Savage,
-            5: Ferocity,
+            20: Dwarf,
+            15: Elf,
         },
         freq: 5,
         components: [DoorOpener, Equipper, Inventory],
@@ -40,10 +43,11 @@ export const CREATURES = {
             char: '@',
             color: Swatch.cultistPurple,
         },
-        tags: ["human", "cult"],
+        tags: ["humanoid", "cult"],
         egos: {
-            5: Savage,
+            15: Elf,
+            20: Dwarf,
         },
         freq: 3
-    }
+    },
 }

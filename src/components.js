@@ -136,7 +136,7 @@ export const EquipmentStats = new Mixin('equipStats', 'equipStats', {
     }
 })
 
-export const Equipper = new Mixin('equipper', 'stats', {
+export const Equipper = new Mixin('equipper', 'combatStats', {
     get allEquipped() {
         if (!this.inventoryItems) return [];
         return this.inventoryItems.filter(item => item.equipped);
@@ -179,7 +179,11 @@ export const Equipper = new Mixin('equipper', 'stats', {
 
     get vision() { 
         const eqVision = this.equippedTorch && this.equippedTorch.vision || 0;
-        return Math.max(this._vision, eqVision)
+        if (GameManager.curMap.dark && this.darkvision) {
+            //light sources don't help when not dark
+            return Math.max(this.darkvision, eqVision);
+        }
+        return this._vision; 
     },
 
     equip(eID, slot) {
@@ -202,3 +206,54 @@ export const Equipper = new Mixin('equipper', 'stats', {
     get equippedTorch() { return this.getEquipSlot(EquipSlots.TORCH); }
 });
 
+export const SecondaryStats = new Mixin("combatStats", "combatStats", {
+    init(opts) {
+        this._atp = opts.atp || 0;
+        this._dfp = opts.dfp || 0;
+        this._tou = opts.tou || 0;
+        this._wil = opts.wil || 0;
+        this._pwr = opts.pwr || 0;
+        this._dmg = opts.dmg || "1d2";
+    },
+    
+    get str() { return this._str; },   
+    get stam() { return this._stam; },
+    get spd() { return this._spd; },
+    get skl() { return this._skl; },
+    get sag() { return this._sag; },
+    get smt() { return this._smt; },
+
+    get atp() { return this._skl + this._atp; },
+    get dfp() { return this._skl + this._dfp; },
+    get tou() { return this._stam + this._tou; },
+    get wil() { return this._wil + this._wil; },
+    get pwr() { return this._smt + this._pwr; },
+    get dmg() { 
+        const bonus = this._str;
+        const dmgBonusEx = /(?<base>\d+d\d+)(?<bonus>(?:\+|\-)\d+)?/ig;
+        const diceMatch = dmgBonusEx.exec(this._dmg);
+        let baseDice;
+        if (diceMatch)  {
+            if (diceMatch.bonus) {
+                bonus += parseInt(diceMatch.groups.bonus);
+            }
+
+            baseDice = diceMatch.groups.base;
+        }
+        let bonusStr = "";
+        if (bonus > 0) {
+            bonusStr = `+${bonus}`;
+        } else if (bonus < 0) {
+            bonusStr = `${bonus}`;
+        }
+        return `${baseDice}${bonusStr}`
+    },
+
+    get vision() {
+        if (GameManager.curMap.dark) {
+            return this._darkvision;
+        } else {
+            return this._vision;
+        }
+    }
+})

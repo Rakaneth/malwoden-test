@@ -1,4 +1,5 @@
 import { Util } from 'malwoden';
+import { debugPrint } from './gameconfig';
 
 export default class DijkstraMap extends Util.Table {
     constructor(width, height, passableCB, topology = "four") {
@@ -19,6 +20,7 @@ export default class DijkstraMap extends Util.Table {
     }
 
     scan(...goals) {
+        let scanStartTime = new Date();
         if (goals.length === 0) return;
         let visited = {};
         const visit = (p) => {
@@ -42,6 +44,8 @@ export default class DijkstraMap extends Util.Table {
                 horizon.push(n);
             }
         }
+        let scanEndTime = new Date();
+        debugPrint(`Dscan took ${scanEndTime - scanStartTime} ms`);
 
     }
 

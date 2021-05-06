@@ -56,7 +56,7 @@ window.onload = () => {
     const pcb = (pt, v) => testMap.isWalkable(pt);
     const dMap = new DijkstraMap(testMap.width, testMap.height, pcb);
     dMap.scan(player.pos);
-    dMap.print();
+    console.log(dMap.get(player.pos));
 
     //testNormal(1, 4, 2);
     //testNormal(1, 4, 5);

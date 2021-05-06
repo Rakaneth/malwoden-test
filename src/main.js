@@ -12,6 +12,7 @@ import CharScreen from './screens/charscreen';
 import { nextNormal, rollDice, testDiff, testNormal, testRollDice, testUniform } from './rng';
 import { Elf, Wolfborn, Dwarf } from './races';
 import HelpScreen from './screens/helpscreen';
+import DijkstraMap from './dijkstramap';
 
 window.onload = () => {
     const mountNode = document.getElementById('canvas');
@@ -52,9 +53,14 @@ window.onload = () => {
         HelpScreen);
     ScreenManager.curScreen = "main";
 
+    const pcb = (pt, v) => testMap.isWalkable(pt);
+    const dMap = new DijkstraMap(testMap.width, testMap.height, pcb);
+    dMap.scan(player.pos);
+    dMap.print();
+
     //testNormal(1, 4, 2);
     //testNormal(1, 4, 5);
-    testDiff(10, 5, 15);
+    //testDiff(10, 5, 15);
 
     GameManager.updateFOV();
 

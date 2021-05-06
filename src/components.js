@@ -4,6 +4,7 @@ import { remove } from 'lodash'
 import { GameRNG } from './rng'
 import { EquipSlots } from './equipslots';
 import { clamp } from './utils';
+import { makeWaitAction } from './actions';
 
 //flags
 export const Blocker = new Mixin("blocker", "blocker");
@@ -190,8 +191,15 @@ export const Equipper = new Mixin('equipper', 'combatStats', 2, {
         return `${base}${bonusStr}`;
     },
 
-    get vision() { 
-        const eqVision = this.equippedTorch && this.equippedTorch.vision || 0;
+    get vision() {
+        if (!GameManager.curMap) return 0; //for lodash
+        let eqVision;
+        if (this.equippedTorch) {
+            eqVision = Math.max(this.equippedTorch.vision, this._vision);
+        } else {
+            eqVision = this._vision;
+        }
+        
         if (GameManager.curMap.dark && this.darkvision) {
             //light sources don't help when not dark
             return Math.max(this.darkvision, eqVision);
@@ -263,6 +271,7 @@ export const SecondaryStats = new Mixin("combatStats", "combatStats", 2, {
     },
 
     get vision() {
+        if (!GameManager.curMap) return 0; //for lodash
         if (GameManager.curMap.dark) {
             return this._darkvision;
         } else {
@@ -276,7 +285,7 @@ export const Actor = new Mixin('actor', 'actor', 1, {
         this._ai = opts.ai || "hunt";
     },
     getNextAction() {
-        //TODO: AI
+        return makeWaitAction();
     }
 });
 
@@ -285,6 +294,7 @@ export const Player = new Mixin("player", "actor", 1, {
         this._action = null;
     },
     getNextAction() { return this._action; },
+    set nextAction(cb) { this._action = cb; },
     clearAction() { this._action = null; }
 });
 

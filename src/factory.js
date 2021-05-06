@@ -6,7 +6,8 @@ import {
     Vision, 
     Equipper, 
     PrimaryStats,
-    Vitals
+    Vitals,
+    Actor
 } from "./components";
 
 import { Entity } from './entity';
@@ -25,7 +26,7 @@ export const EntityType = {
     },
     CREATURE: {
         layer: 2,
-        components: [Blocker, Vision, PrimaryStats, Vitals],
+        components: [Actor, Blocker, Vision, PrimaryStats, Vitals],
     },
     EQUIP: {
         layer: 1,

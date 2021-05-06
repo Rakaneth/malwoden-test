@@ -1,9 +1,10 @@
 import { Rand } from 'malwoden';
+import { Scheduler } from './scheduler';
 import { wrap } from './utils';
 
 class Game {
     constructor() {
-        this._scheduler = {};
+        this._scheduler = null;
         this._entities = {};
         this._maps = {};
         this._curMapId = "none";
@@ -33,6 +34,9 @@ class Game {
 
     set curMap(newMapId) {
         this._curMapId = newMapId;
+        const pred = (e) => e.has('actor');
+        const toSched = this.curEntities.filter(pred);
+        this._scheduler = new Scheduler(toSched);
     }
 
     addMap(m) {
@@ -41,6 +45,9 @@ class Game {
 
     addEntity(entity) {
         this._entities[entity.id] = entity;
+        if (entity.has('actor') && entity.mapID === this._curMapId) {
+            this._scheduler.add(entity, this.currentTurn);
+        }
     }
 
     addMsg(msg) {
@@ -48,11 +55,8 @@ class Game {
     }
 
     removeEntity(entity) {
-        if (typeof(entity) === 'object') {
-            delete this._entities[entity.id];
-        } else if (typeof(entity) === 'string') {
-            delete this._entities[entity];
-        }
+        this._scheduler.remove(entity);
+        delete this._entities[entity.id];
     }
 
     getEntity(eID) { return this._entities[eID]; }
@@ -81,7 +85,11 @@ class Game {
         return this.player.canSee(pointOrEntity);
     }
 
-    
+    update() {
+        this._scheduler.update();
+    }
+
+    get currentTurn() { return this._scheduler.currentTurn; }
 }
 
 export const GameManager = new Game();

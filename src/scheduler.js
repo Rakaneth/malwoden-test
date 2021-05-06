@@ -1,3 +1,4 @@
+import { debugPrint } from './gameconfig';
 
 const queueCB = (fst, snd) => fst.tick - snd.tick;
 
@@ -7,10 +8,16 @@ export class Scheduler {
         for (let e of entities) {
             this.add(e, 1 - (e.spd / 100));
         }
+        this._currentTurn = 0;
     }
 
     add(entity, tick) {
-        this._queue.push({actor: entity, tick});
+        let t = tick;
+        if (t < this.currentTurn) {
+            const fractionalTurn = tick - Math.floor(t);
+            t += this.currentTurn + fractionalTurn;
+        }
+        this._queue.push({actor: entity, tick: t});
         this._queue.sort(queueCB);
     }
 
@@ -23,14 +30,25 @@ export class Scheduler {
 
     update() {
         let action;
-        do {
+        while(true) {
             let n = this.next;
+            this._currentTurn = Math.floor(n.tick);
             action = n.actor.getNextAction();
             if (action) {
+                debugPrint(`${n.actor.name} acts on ${n.tick}`, "UPDATE");
                 const cost = action();
                 n.tick += cost;
                 this._queue.sort(queueCB);
+                if (n.actor.has('player')) {
+                    n.actor.clearAction();
+                }
+            } else {
+                break;
             }
-        } while (action);
+        } 
+    }
+
+    get currentTurn() {
+        return this._currentTurn;
     }
 }

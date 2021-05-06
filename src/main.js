@@ -30,18 +30,18 @@ window.onload = () => {
     const bspTest = MapFactory.bsp(130, 82, "bspTest", "BSP Test", true);
     GameManager.addMap(testMap);
     GameManager.addMap(bspTest);
-    GameManager.curMap = "test-map";
     const player = EntityFactory.makePlayer('rogue', "Farin", Dwarf);
-    seed(player);
+    seed(player, testMap);
     for (let n=0; n<10; n++) {
         const npc = EntityFactory.randomCreature();
-        seed(npc);
+        seed(npc, testMap);
     }
 
     for (let e=0; e<10; e++) {
         const eq = EntityFactory.randomEquipment();
-        seed(eq);
+        seed(eq, testMap);
     }
+    GameManager.curMap = "test-map";
 
     //ScreenManager.register(new MainScreen(terminal));
     ScreenManager.registerMany(
@@ -64,6 +64,7 @@ window.onload = () => {
         GameManager.addMsg(`Reasonably long message that is longer than forty-seven characters ${i}`);
     }
     GameManager.addMsg("Msg 51");
+    GameManager.update();
     ScreenManager.render();
 }
 

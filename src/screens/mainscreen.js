@@ -3,6 +3,7 @@ import { Color, Glyph, GUI, Input, Terminal } from 'malwoden';
 import { clamp, wrap, clip} from '../utils';
 import { GameManager } from '../game';
 import { capitalize } from 'lodash';
+import { makeTryMoveAction } from '../actions';
 
 const MAP_W = 60;
 const MAP_H = 30;
@@ -25,19 +26,24 @@ function openHelpCB() {
     ScreenManager.curScreen = "help";
 }
 
+function movePlayerBy(dx, dy) {
+    const player = GameManager.player;
+    player.nextAction = makeTryMoveAction(player, dx, dy);
+    return true;
+}
+
 export default class MainScreen extends Screen {
     
     constructor(rootTerminal) {
         super("main", rootTerminal);
-        this._mapvp = rootTerminal.port({x: 0, y: 0}, MAP_W, MAP_H);
-        const boundMoveBy = GameManager.player.moveBy.bind(GameManager.player);   
+        this._mapvp = rootTerminal.port({x: 0, y: 0}, MAP_W, MAP_H);   
         this._toolTip = null;
         const boundOnClick = this._onClick.bind(this);
         this._keyboardContext = new Input.KeyboardContext()
-            .onDown(Input.KeyCode.W, this.renderCB(boundMoveBy, 0, -1))
-            .onDown(Input.KeyCode.A, this.renderCB(boundMoveBy, -1, 0))
-            .onDown(Input.KeyCode.S, this.renderCB(boundMoveBy, 0, 1))
-            .onDown(Input.KeyCode.D, this.renderCB(boundMoveBy, 1, 0))
+            .onDown(Input.KeyCode.W, this.renderCB(movePlayerBy, 0, -1))
+            .onDown(Input.KeyCode.A, this.renderCB(movePlayerBy, -1, 0))
+            .onDown(Input.KeyCode.S, this.renderCB(movePlayerBy, 0, 1))
+            .onDown(Input.KeyCode.D, this.renderCB(movePlayerBy, 1, 0))
             .onDown(Input.KeyCode.M, openMsgCB)
             .onDown(Input.KeyCode.C, openCharCB)
             .onDown(Input.KeyCode.H, openHelpCB);

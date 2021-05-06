@@ -56,8 +56,10 @@ export class Screen {
 
     renderCB(fn, ...args) {
         return function() {
-            fn(...args);
-            GameManager.updateFOV();
+            if (fn(...args)) {
+                GameManager.update();
+                GameManager.updateFOV();
+            };            
             ScreenManager.render();
         }
     }

@@ -42,5 +42,17 @@ export const EQUIPMENT = {
         dmg: "1d6",
         slots: EquipSlots.WEAPON,
         freq: 3,
+    },
+    torch: {
+        name: "Torch",
+        desc: "A long length of wood, serviceable as a torch.",
+        glyph: {
+            char: '~',
+            color: Swatch.fireOrange,
+        },
+        tags: ["torch"],
+        vision: 8,
+        slots: EquipSlots.TORCH,
+        freq: 10,
     }
 }

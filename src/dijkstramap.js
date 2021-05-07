@@ -12,11 +12,11 @@ export default class DijkstraMap extends Util.Table {
     _lowestNeighbor(p) {
         let neis = this.getNeighbors(p, this._passableCB, this._topology);
         if (neis.length === 0) {
-            return Number.MAX_SAFE_INTEGER;
+            return {point: null, val: Number.MAX_SAFE_INTEGER};
         } 
         
         neis.sort((fst, snd) => this.get(fst) - this.get(snd));
-        return this.get(neis[0]);
+        return {point: neis[0], val: this.get(neis[0])};
     }
 
     scan(...goals) {

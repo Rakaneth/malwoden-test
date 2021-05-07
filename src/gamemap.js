@@ -1,5 +1,6 @@
 import { Util, FOV, Terminal, Glyph, Generation} from 'malwoden';
 import { BSPNode, bspSplit, inOrder } from './bsp';
+import DijkstraMap from './dijkstramap';
 import { MapRNG } from './rng';
 
 export class Tile {
@@ -33,11 +34,13 @@ export class GameMap {
         this._explored = new Util.Table(width, height);
         this._explored.fill(false);
         const fovCB = this.isTransparent.bind(this);
+        const dijkCB = this.isWalkable.bind(this);
         const fovOptions = {
             topology: "four",
             lightPasses: fovCB,
         };
         this._fov = new FOV.PreciseShadowcasting(fovOptions);
+        this._dmap = new DijkstraMap(width, height, dijkCB, "four");
     }
 
     get dark() { return this._dark; }
@@ -45,6 +48,7 @@ export class GameMap {
     get name() { return this._name; }
     get width() { return this._tiles.width; }
     get height() { return this._tiles.height; }
+    get dMap() { return this._dmap; }
     
     inBounds(p) {
         return p.x >= 0 && p.x < this.width && p.y >= 0 && p.y < this.height;

@@ -3,12 +3,12 @@ import { debugPrint } from './gameconfig';
 const queueCB = (fst, snd) => fst.tick - snd.tick;
 
 export class Scheduler {
-    constructor(entities) {
+    constructor(entities, startTurn) {
         this._queue = [];
         for (let e of entities) {
-            this.add(e, 1 - (e.spd / 100));
+            this.add(e, 1 + startTurn  - (e.spd / 100));
         }
-        this._currentTurn = 0;
+        this._currentTurn = startTurn;
     }
 
     add(entity, tick) {
@@ -49,6 +49,6 @@ export class Scheduler {
     }
 
     get currentTurn() {
-        return this._currentTurn;
+        return this._currentTurn || 0;
     }
 }

@@ -53,11 +53,6 @@ window.onload = () => {
         HelpScreen);
     ScreenManager.curScreen = "main";
 
-    const pcb = (pt, v) => testMap.isWalkable(pt);
-    const dMap = new DijkstraMap(testMap.width, testMap.height, pcb);
-    dMap.scan(player.pos);
-    console.log(dMap.get(player.pos));
-
     //testNormal(1, 4, 2);
     //testNormal(1, 4, 5);
     //testDiff(10, 5, 15);

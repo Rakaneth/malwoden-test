@@ -38,7 +38,7 @@ class Game {
         const pred = (e) => e.has('actor');
         const toSched = this.curEntities.filter(pred);
         this._scheduler = new Scheduler(toSched, this._currentTurn);
-        this.curMap.dMap.scan(this.player.pos);
+        this.curMap.dMap.build(this.player.pos);
     }
 
     addMap(m) {
@@ -89,7 +89,8 @@ class Game {
 
     update() {
         this._scheduler.update();
-        this._currentTurn = this._scheduler._currentTurn;
+        this._currentTurn = this._scheduler.currentTurn;
+        this.curMap.dMap.build(this.player.pos);
     }
 
     get currentTurn() { return this._scheduler.currentTurn; }

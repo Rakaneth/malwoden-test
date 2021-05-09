@@ -1,5 +1,5 @@
 import {ScreenManager, Screen, makeStatString } from './screen';
-import { Color, Glyph, GUI, Input, Terminal } from 'malwoden';
+import { CharCode, Color, Glyph, GUI, Input, Terminal } from 'malwoden';
 import { clamp, wrap, clip} from '../utils';
 import { GameManager } from '../game';
 import { capitalize } from 'lodash';
@@ -32,6 +32,11 @@ function movePlayerBy(dx, dy) {
     return true;
 }
 
+function makeFleeMap() {
+    GameManager.curMap.dMap.toFleeMap();
+    GameManager.curMap.dMap.scan(GameManager.player.pos);
+}
+
 export default class MainScreen extends Screen {
     
     constructor(rootTerminal) {
@@ -46,10 +51,13 @@ export default class MainScreen extends Screen {
             .onDown(Input.KeyCode.D, this.renderCB(movePlayerBy, 1, 0))
             .onDown(Input.KeyCode.M, openMsgCB)
             .onDown(Input.KeyCode.C, openCharCB)
-            .onDown(Input.KeyCode.H, openHelpCB);
+            .onDown(Input.KeyCode.H, openHelpCB)
+            .onDown(Input.KeyCode.Space, this.renderCB(makeFleeMap));
+
         this._mouseContext = new Input.MouseContext()
             .onMouseDown(boundOnClick);
         this._target = null;
+        this._testDijkstra = false;
     }
 
     get center() { return GameManager.player.pos; }
@@ -101,7 +109,14 @@ export default class MainScreen extends Screen {
                     //it's a real map tile
                     if (GameManager.player.canSee(mapPos)) {
                         //we can see it, draw normally
-                        this._drawAtPosition(screenPos, t.glyph)
+                        if (this._testDijkstra) {
+                            let v = GameManager.curMap.dMap.get(mapPos);
+                            let dColor = new Color(128 - 14 * v, 0, 128 + 14 * v);
+                            let dGlyph = Glyph.fromCharCode(CharCode.fullBlock, dColor);
+                            this._drawAtPosition(screenPos, dGlyph);
+                        } else {
+                            this._drawAtPosition(screenPos, t.glyph)
+                        }
                     } else if (GameManager.curMap.isExplored(mapPos)) {
                         //we've explored it, so we remember the layout
                         const darkGlyph = Glyph.fromCharCode(t.glyph.char, Color.DarkBlue);

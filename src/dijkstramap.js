@@ -19,8 +19,9 @@ export default class DijkstraMap extends Util.Table {
         return {point: neis[0], val: this.get(neis[0])};
     }
 
-    scan(...goals) {
+    build(...goals) {
         let scanStartTime = new Date();
+        this.fill(Number.MAX_SAFE_INTEGER);
         if (goals.length === 0) return;
         let visited = {};
         const visit = (p) => {
@@ -37,6 +38,7 @@ export default class DijkstraMap extends Util.Table {
             let check = this.get(next);
             for (let n of this.getNeighbors(next, this._passableCB, this._topology)) {
                 if (isDone(n)) continue;
+                if (!this.isInBounds(n)) continue;
                 if (this.get(n) > check + 1) {
                     this.set(n, check + 1);
                 }
@@ -45,9 +47,48 @@ export default class DijkstraMap extends Util.Table {
             }
         }
         let scanEndTime = new Date();
-        debugPrint(`Dscan took ${scanEndTime - scanStartTime} ms`);
-
+        debugPrint(`Dbuild took ${scanEndTime - scanStartTime} ms`);
     }
+
+    scan (...goals) {
+        let scanStartTime = new Date();
+        if (!goals || goals.length === 0) return;
+        if (!this._items) return;
+        this._items.forEach((v) => {if (v === 0) v = Number.MAX_SAFE_INTEGER})
+        for (let g of goals) {
+            this.set(g, 0);
+        }
+        
+        let changed = true;
+        while(changed) {
+            changed = false;
+            for (let y=0; y<this.height; y++) {
+                for (let x=0; x<this.width; x++) {
+                    let v = this.get({x, y});
+                    let {point, val} = this._lowestNeighbor({x, y});
+                    if (point === null) continue;
+                    if (v > val + 1) {
+                        this.set({x, y}, val + 1);
+                        changed = true;
+                    }
+                }
+            }
+        }
+
+        let scanEndTime = new Date();
+        debugPrint(`Dscan took ${scanEndTime - scanStartTime} ms`);
+    }
+
+    toFleeMap() {
+        for (let y=0; y<this.height; y++) {
+            for (let x=0; x<this.width; x++) {
+                if (this._passableCB({x, y})) {
+                    this.set({x, y}, this.get({x, y}) * -1.2);
+                } 
+            }
+        }
+    }
+
 
     print() {
         for (let y=0; y<this.height; y++) {

@@ -28,7 +28,7 @@ export default class DijkstraMap extends Util.Table {
             visited[`${p.x},${p.y}`] = true;
         }
         const isDone = (p) => visited[`${p.x},${p.y}`];
-        for (let p of goals) {
+        for (let p of goals.filter(g => this._passableCB(g))) {
             this.set(p, 0);
             visit(p);
         }
@@ -38,7 +38,6 @@ export default class DijkstraMap extends Util.Table {
             let check = this.get(next);
             for (let n of this.getNeighbors(next, this._passableCB, this._topology)) {
                 if (isDone(n)) continue;
-                if (!this.isInBounds(n)) continue;
                 if (this.get(n) > check + 1) {
                     this.set(n, check + 1);
                 }

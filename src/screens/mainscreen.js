@@ -147,7 +147,7 @@ export default class MainScreen extends Screen {
                 }
             }
         }
-        if (this._target) {
+        if (this._target && GameManager.playerCanSee(this._target)) {
             const tPos = this._mapToScreen(GameManager.curMap, this._target);
             const tGlyph = new Glyph('X', Color.Cyan);
             this._drawAtPosition(tPos, tGlyph);

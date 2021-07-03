@@ -13,6 +13,7 @@ import { nextNormal, rollDice, testDiff, testNormal, testRollDice, testUniform }
 import { Elf, Wolfborn, Dwarf } from './races';
 import HelpScreen from './screens/helpscreen';
 import DijkstraMap from './dijkstramap';
+import TitleScreen from './screens/titlescreen';
 
 window.onload = () => {
     const mountNode = document.getElementById('canvas');
@@ -47,11 +48,12 @@ window.onload = () => {
     //ScreenManager.register(new MainScreen(terminal));
     ScreenManager.registerMany(
         terminal, 
+        TitleScreen,
         MainScreen, 
         MessageScreen,
         CharScreen,
         HelpScreen);
-    ScreenManager.curScreen = "main";
+    ScreenManager.curScreen = "title";
 
     //testNormal(1, 4, 2);
     //testNormal(1, 4, 5);

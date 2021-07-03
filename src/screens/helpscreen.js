@@ -17,7 +17,7 @@ export default class HelpScreen extends Screen {
     _onRender() {
         this.box(0, 0, "Help");
         this._printCmd(1, 1, "Key", "Command");
-        this.print(1, 2, "Main Screen");
+        this.print(1, 2, "Main screen");
         this._printCmd(1, 3, "h", "This help screen");
         this._printCmd(1, 4, "w", "Move up");
         this._printCmd(1, 5, "a", "Move left");
@@ -26,7 +26,7 @@ export default class HelpScreen extends Screen {
         this._printCmd(1, 8, "c", "Show character screen");
         this._printCmd(1, 9, "m", "Show messages");
 
-        this.print(1, 11, "Help Screen (this screen)");
+        this.print(1, 11, "Help screen (this screen)");
         this._printCmd(1, 12, "Esc", "Return to main screen");
 
         this.print(1, 14, "Character screen");
@@ -36,5 +36,7 @@ export default class HelpScreen extends Screen {
         this._printCmd(1, 18, "w", "Scroll up");
         this._printCmd(1, 19, "d", "Scroll down");
         this._printCmd(1, 20, "Esc", "Return to main screen");
+
+        this.print(1, 22, "Left-click on an object in the world to examine it.");
     }
 }

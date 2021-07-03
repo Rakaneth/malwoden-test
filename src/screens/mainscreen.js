@@ -22,7 +22,7 @@ function openMsgCB() {
     ScreenManager.curScreen = "message"; 
 }
 
-function openHelpCB() {
+export function openHelpCB() {
     ScreenManager.curScreen = "help";
 }
 

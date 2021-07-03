@@ -4,6 +4,6 @@ This is a tech demo of the [Malwoden](https://malwoden.com) library. There are s
 
 # Installation #
 
-`git clone https://github.com/Rakaneth.malwoden-test`
-`npm install`
-`npm run start`
+* `git clone https://github.com/Rakaneth.malwoden-test`
+* `npm install`
+* `npm run start`
